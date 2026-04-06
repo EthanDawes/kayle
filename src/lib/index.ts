@@ -1,1 +1,3 @@
-// place files you want to import through the `$lib` alias in this folder.
+const G = 1
+const MG = G / 1000
+const MCG = MG / 1000
