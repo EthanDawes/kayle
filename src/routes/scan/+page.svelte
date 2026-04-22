@@ -61,6 +61,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Kayle Scan</title>
+</svelte:head>
+
 <div class="relative h-full">
   <Camera onPhotoCaptured={handleCapture} />
 
@@ -82,8 +86,18 @@
       class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-zinc-950/95 p-8 backdrop-blur-sm"
       style="font-family: 'DM Mono', monospace;"
     >
-      <svg class="h-10 w-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      <svg
+        class="h-10 w-10 text-red-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+        />
       </svg>
       <p class="text-center text-sm leading-relaxed text-zinc-300">{error}</p>
       <button

@@ -22,6 +22,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Kayle Settings</title>
+</svelte:head>
+
 <div class="flex flex-col gap-6 p-5" style="font-family: 'DM Mono', monospace;">
   <div class="pt-2">
     <p class="text-xs tracking-[0.2em] text-zinc-500 uppercase">Configuration</p>

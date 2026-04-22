@@ -29,6 +29,10 @@
   })
 </script>
 
+<svelte:head>
+  <title>Kayle Home</title>
+</svelte:head>
+
 <div class="flex h-full w-full flex-col" style="font-family: 'DM Mono', monospace;">
   <!-- Header -->
   <div class="pt-2">
