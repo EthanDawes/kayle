@@ -1,5 +1,5 @@
 <script>
-  import NutritionLabel from "./NutritionLabel.svelte"
+  import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
 </script>
 
 <NutritionLabel />

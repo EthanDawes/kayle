@@ -1,5 +1,5 @@
 <script>
-  import Camera from "./Camera.svelte"
+  import Camera from "$lib/UI/Camera.svelte"
 </script>
 
 <Camera onPhotoCaptured={() => {}} />
