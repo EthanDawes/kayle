@@ -2,6 +2,7 @@
   import "./layout.css"
   import favicon from "$lib/assets/favicon.svg"
   import { page } from "$app/state"
+  import { resolve } from "$app/paths"
 
   let { children } = $props()
 
@@ -31,7 +32,7 @@
     <div class="flex">
       {#each nav as item}
         <a
-          href={item.href}
+          href={resolve(item.href)}
           class="flex flex-1 flex-col items-center gap-1 py-3 text-xs tracking-[0.15em] uppercase transition-colors {page
             .url.pathname === item.href
             ? 'text-black'
