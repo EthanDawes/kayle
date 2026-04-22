@@ -1,10 +1,6 @@
-export interface FoodAnalysis {
-  name: string
-  calories?: number
-  protein?: number
-  fat?: number
-  carbs?: number
-  servingSize?: string
+import type { Nutrients } from "$lib/models/meal"
+
+export interface FoodAnalysis extends Nutrients {
   description?: string
 }
 
@@ -14,21 +10,32 @@ export async function analyzeFood(
   menuContext?: string,
 ): Promise<FoodAnalysis> {
   const prompt = [
-    "Analyze the food in this image. Return a JSON object with these fields:",
-    "- name: string (specific food name)",
-    "- calories: number (estimated kcal for the visible portion)",
-    "- protein: number (grams)",
-    "- fat: number (grams)",
-    "- carbs: number (grams)",
-    "- servingSize: string (e.g. '1 cup', '200g', '1 slice')",
-    "- description: string (one short sentence)",
-    menuContext
+    "Analyze the food in this image. Return a JSON object with this shape:",
+    `
+// All units are in grams
+export interface Nutrients {
+  description: string (one short sentence)
+  calories: number
+  totalFat: number
+  saturatedFat: number
+  transFat: number
+  cholesterol: number
+  sodium: number
+  totalCarbohydrate: number
+  dietaryFiber: number
+  totalSugars: number
+  addedSugars: number
+  protein: number
+  vitaminD: number
+  vitaminC: number
+  calcium: number
+  iron: number
+  potassium: number
+}` + menuContext
       ? `\nThis food may be from a dining hall. Context:\n${menuContext}\nMatch the item if possible for better accuracy.`
       : "",
     "\nReturn only valid JSON, no markdown fences.",
-  ]
-    .filter(Boolean)
-    .join("\n")
+  ].join("\n")
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -54,7 +61,9 @@ export async function analyzeFood(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error((err as { error?: { message?: string } }).error?.message ?? `OpenAI ${res.status}`)
+    throw new Error(
+      (err as { error?: { message?: string } }).error?.message ?? `OpenAI ${res.status}`,
+    )
   }
 
   const data = await res.json()

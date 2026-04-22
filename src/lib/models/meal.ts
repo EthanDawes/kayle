@@ -4,11 +4,7 @@ export interface Meal {
   timestamp: number
   mode: "barcode" | "food"
   name: string
-  calories?: number
-  protein?: number
-  fat?: number
-  carbs?: number
-  servingSize?: string
+  nutrients: Nutrients
   description?: string
   brand?: string
   imageDataUrl?: string
@@ -17,14 +13,31 @@ export interface Meal {
 
 export interface NutritionInfo {
   name: string
-  calories?: number
-  protein?: number
-  fat?: number
-  carbs?: number
-  servingSize?: string
+  nutrients: Nutrients
   description?: string
   brand?: string
   source: "openfoodfacts" | "openai"
 }
 
-export interface
+// All units are in grams
+export interface Nutrients {
+  calories?: number
+  //servingSize?: string
+  totalFat?: number
+  saturatedFat?: number
+  transFat?: number
+  cholesterol?: number
+  sodium?: number
+  totalCarbohydrate?: number
+  dietaryFiber?: number
+  totalSugars?: number
+  addedSugars?: number
+  protein?: number
+
+  // These are the micronutrients
+  vitaminD?: number
+  vitaminC?: number
+  calcium?: number
+  iron?: number
+  potassium?: number
+}

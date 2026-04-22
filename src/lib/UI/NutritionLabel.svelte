@@ -1,42 +1,12 @@
 <script lang="ts">
-  // Daily Values reference (in grams unless noted)
-  const DAILY_VALUES = {
-    totalFat: 78,
-    saturatedFat: 20,
-    transFat: 0, // No official DV; 0 means "no bar"
-    cholesterol: 0.3, // 300mg → stored as grams equivalent
-    sodium: 2.3, // 2300mg → stored as grams equivalent
-    totalCarbohydrate: 275,
-    dietaryFiber: 28,
-    totalSugars: 50,
-    addedSugars: 50,
-    protein: 50,
-    vitaminD: 0.00002, // 20mcg → grams
-    calcium: 1.3, // 1300mg → grams
-    iron: 0.018, // 18mg → grams
-    potassium: 4.7, // 4700mg → grams
-  } as const
+  import { DAILY_VALUES } from "$lib"
+  import type { Nutrients } from "$lib/models/meal"
 
   type NutrientKey = keyof typeof DAILY_VALUES
 
-  interface NutritionProps {
+  interface NutritionProps extends Nutrients {
     servingSize?: string
     servingsPerContainer?: number
-    calories?: number
-    totalFat?: number
-    saturatedFat?: number
-    transFat?: number
-    cholesterol?: number
-    sodium?: number
-    totalCarbohydrate?: number
-    dietaryFiber?: number
-    totalSugars?: number
-    addedSugars?: number
-    protein?: number
-    vitaminD?: number
-    calcium?: number
-    iron?: number
-    potassium?: number
   }
 
   let {
