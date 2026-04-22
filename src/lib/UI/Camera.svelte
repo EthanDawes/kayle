@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte"
+  import Spinner from "./components/Spinner.svelte"
 
   type Mode = "food" | "barcode"
 
@@ -116,9 +117,7 @@
   {#if !cameraReady && !error}
     <div class="absolute inset-0 z-10 flex items-center justify-center">
       <div class="flex flex-col items-center gap-4">
-        <div
-          class="h-8 w-8 animate-spin rounded-full border-2 border-black/20 border-t-black/80"
-        ></div>
+        <Spinner />
         <span class="text-xs tracking-[0.2em] text-zinc-500 uppercase">Initializing camera</span>
       </div>
     </div>
