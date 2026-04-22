@@ -14,10 +14,7 @@
   const icon = $derived(meal.mode === "barcode" ? "📦" : "🍽")
 </script>
 
-<div
-  class="flex items-center gap-3 rounded-2xl bg-zinc-900 p-4"
-  style="font-family: 'DM Mono', monospace;"
->
+<div class="flex items-center gap-3 rounded-2xl p-4" style="font-family: 'DM Mono', monospace;">
   {#if meal.imageDataUrl}
     <img
       src={meal.imageDataUrl}
@@ -25,9 +22,7 @@
       class="h-14 w-14 shrink-0 rounded-xl object-cover"
     />
   {:else}
-    <div
-      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-zinc-800 text-2xl"
-    >
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl text-2xl">
       {icon}
     </div>
   {/if}
@@ -53,13 +48,7 @@
       class="shrink-0 rounded-full p-2 text-zinc-700 transition-colors hover:text-zinc-400"
       aria-label="Remove meal"
     >
-      <svg
-        class="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-      >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>

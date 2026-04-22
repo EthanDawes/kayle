@@ -42,11 +42,13 @@
 
   {#if loading}
     <div class="flex items-center justify-center py-16">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"></div>
+      <div
+        class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"
+      ></div>
     </div>
   {:else if overview}
     <!-- Summary card -->
-    <div class="rounded-2xl bg-zinc-900 p-5">
+    <div class="rounded-2xl border border-zinc-900 p-5">
       <div class="flex items-center gap-5">
         <!-- Calorie ring -->
         <div class="relative shrink-0">
@@ -80,11 +82,7 @@
             {overview.mealCount} meal{overview.mealCount !== 1 ? "s" : ""} logged
           </p>
           <div class="mt-3 grid grid-cols-3 gap-1 text-xs">
-            {#each [
-              { label: "Protein", value: overview.totalProtein, goal: PROTEIN_GOAL, color: "#3b82f6" },
-              { label: "Carbs", value: overview.totalCarbs, goal: 275, color: "#f59e0b" },
-              { label: "Fat", value: overview.totalFat, goal: 78, color: "#ef4444" },
-            ] as m (m.label)}
+            {#each [{ label: "Protein", value: overview.totalProtein, goal: PROTEIN_GOAL, color: "#3b82f6" }, { label: "Carbs", value: overview.totalCarbs, goal: 275, color: "#f59e0b" }, { label: "Fat", value: overview.totalFat, goal: 78, color: "#ef4444" }] as m (m.label)}
               <div>
                 <p class="text-zinc-600">{m.label}</p>
                 <p class="font-semibold text-white">{m.value.toFixed(0)}g</p>

@@ -69,7 +69,7 @@
 
 <!-- Root — no rounded edges -->
 <div
-  class="relative h-full min-h-125 w-full overflow-hidden bg-black select-none"
+  class="relative h-full min-h-125 w-full overflow-hidden select-none"
   style="font-family: 'DM Mono', 'Courier New', monospace;"
 >
   <!-- Live video feed -->
@@ -87,7 +87,7 @@
 
   <!-- Error state -->
   {#if error}
-    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-zinc-950">
+    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
       <svg class="h-12 w-12 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           stroke-linecap="round"
@@ -114,10 +114,10 @@
 
   <!-- Loading state -->
   {#if !cameraReady && !error}
-    <div class="absolute inset-0 z-10 flex items-center justify-center bg-zinc-950">
+    <div class="absolute inset-0 z-10 flex items-center justify-center">
       <div class="flex flex-col items-center gap-4">
         <div
-          class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"
+          class="h-8 w-8 animate-spin rounded-full border-2 border-black/20 border-t-black/80"
         ></div>
         <span class="text-xs tracking-[0.2em] text-zinc-500 uppercase">Initializing camera</span>
       </div>

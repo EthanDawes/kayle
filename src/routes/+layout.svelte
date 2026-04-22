@@ -22,22 +22,19 @@
   />
 </svelte:head>
 
-<div class="mx-auto flex h-dvh max-w-lg flex-col bg-zinc-950">
+<div class="mx-auto flex h-dvh max-w-lg flex-col">
   <main class="min-h-0 flex-1 overflow-y-auto">
     {@render children()}
   </main>
 
-  <nav
-    class="shrink-0 border-t border-zinc-800/60 bg-zinc-950"
-    style="font-family: 'DM Mono', monospace;"
-  >
+  <nav class="shrink-0 border-t" style="font-family: 'DM Mono', monospace;">
     <div class="flex">
       {#each nav as item}
         <a
           href={item.href}
           class="flex flex-1 flex-col items-center gap-1 py-3 text-xs tracking-[0.15em] uppercase transition-colors {page
             .url.pathname === item.href
-            ? 'text-white'
+            ? 'text-black'
             : 'text-zinc-600 hover:text-zinc-400'}"
         >
           <span class="text-base leading-none">{item.icon}</span>

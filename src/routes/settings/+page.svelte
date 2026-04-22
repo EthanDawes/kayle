@@ -28,7 +28,7 @@
     <h1 class="text-2xl font-bold text-white">Settings</h1>
   </div>
 
-  <div class="flex flex-col gap-5 rounded-2xl bg-zinc-900 p-5">
+  <div class="flex flex-col gap-5 rounded-2xl border border-zinc-900 p-5">
     <!-- OpenAI key -->
     <div class="flex flex-col gap-2">
       <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="openai-key">
@@ -41,11 +41,11 @@
           type={showOpenai ? "text" : "password"}
           bind:value={openaiKey}
           placeholder="sk-..."
-          class="w-full rounded-xl bg-zinc-800 px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-white/30"
+          class="w-full rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
         <button
           onclick={() => (showOpenai = !showOpenai)}
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-zinc-500 transition-colors hover:text-zinc-300"
+          class="absolute top-1/2 right-3 -translate-y-1/2 text-lg text-zinc-500 transition-colors hover:text-zinc-300"
           aria-label="Toggle OpenAI key visibility"
           type="button"
         >
@@ -59,18 +59,20 @@
       <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="off-key">
         Open Food Facts API Key
       </label>
-      <p class="text-xs text-zinc-600">Optional — enables higher rate limits for barcode scanning.</p>
+      <p class="text-xs text-zinc-600">
+        Optional — enables higher rate limits for barcode scanning.
+      </p>
       <div class="relative">
         <input
           id="off-key"
           type={showOff ? "text" : "password"}
           bind:value={offKey}
           placeholder="optional"
-          class="w-full rounded-xl bg-zinc-800 px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600 outline-none ring-1 ring-zinc-700 focus:ring-white/30"
+          class="w-full rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
         <button
           onclick={() => (showOff = !showOff)}
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-zinc-500 transition-colors hover:text-zinc-300"
+          class="absolute top-1/2 right-3 -translate-y-1/2 text-lg text-zinc-500 transition-colors hover:text-zinc-300"
           aria-label="Toggle OpenFoodFacts key visibility"
           type="button"
         >
@@ -83,8 +85,8 @@
   <!-- Info box -->
   <div class="rounded-xl border border-zinc-800 p-4">
     <p class="text-xs leading-relaxed text-zinc-600">
-      Keys are stored only in your browser's localStorage. They are sent directly to OpenAI and
-      Open Food Facts and never routed through any other server.
+      Keys are stored only in your browser's localStorage. They are sent directly to OpenAI and Open
+      Food Facts and never routed through any other server.
     </p>
   </div>
 

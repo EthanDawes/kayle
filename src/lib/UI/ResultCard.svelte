@@ -23,7 +23,11 @@
 >
   <div class="w-full max-w-lg rounded-t-3xl bg-zinc-900 p-6 pb-10 shadow-2xl">
     {#if imageDataUrl}
-      <img src={imageDataUrl} alt="Captured food" class="mb-4 h-36 w-full rounded-2xl object-cover" />
+      <img
+        src={imageDataUrl}
+        alt="Captured food"
+        class="mb-4 h-36 w-full rounded-2xl object-cover"
+      />
     {/if}
 
     <!-- Name + calories -->
@@ -52,11 +56,13 @@
     <!-- Macros -->
     <div class="mb-5 grid grid-cols-3 gap-2">
       {#each macros as m (m.label)}
-        <div class="rounded-xl bg-zinc-800 p-3">
+        <div class="rounded-xl p-3">
           <p class="text-xs tracking-widest text-zinc-500 uppercase">{m.label}</p>
-          <p class="mt-0.5 text-lg font-bold text-white">{m.value != null ? m.value.toFixed(1) : "–"}g</p>
+          <p class="mt-0.5 text-lg font-bold">
+            {m.value != null ? m.value.toFixed(1) : "–"}g
+          </p>
           {#if m.value != null}
-            <div class="mt-1.5 h-1 rounded-full bg-zinc-700">
+            <div class="mt-1.5 h-1 rounded-full">
               <div
                 class="h-1 rounded-full transition-all duration-500"
                 style="width: {Math.min(100, (m.value / m.max) * 100)}%; background: {m.color};"
