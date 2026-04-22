@@ -15,14 +15,12 @@ export interface NutritionInfo {
   name: string
   nutrients: Nutrients
   description?: string
-  brand?: string
   source: "openfoodfacts" | "openai"
 }
 
 // All units are in grams
 export interface Nutrients {
   calories?: number
-  //servingSize?: string
   totalFat?: number
   saturatedFat?: number
   transFat?: number

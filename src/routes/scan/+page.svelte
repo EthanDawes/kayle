@@ -11,7 +11,7 @@
   type ScanState = "idle" | "processing" | "result" | "error"
   type ScanMode = "food" | "barcode"
 
-  let state = $state<ScanState>("idle")
+  let cameraState = $state<ScanState>("idle")
   let capturedImage = $state<string | null>(null)
   let capturedMode = $state<ScanMode>("food")
   let result = $state<NutritionInfo | null>(null)
@@ -21,15 +21,15 @@
   async function handleCapture(photo: string, mode: ScanMode) {
     capturedImage = photo
     capturedMode = mode
-    state = "processing"
+    cameraState = "processing"
     statusMessage = mode === "barcode" ? "Detecting barcode..." : "Analyzing food..."
 
     try {
       result = await processScan(photo, mode)
-      state = "result"
+      cameraState = "result"
     } catch (err) {
       error = err instanceof Error ? err.message : "Analysis failed. Please try again."
-      state = "error"
+      cameraState = "error"
     }
   }
 
@@ -40,11 +40,7 @@
       timestamp: Date.now(),
       mode: capturedMode,
       name: result.name,
-      calories: result.calories,
-      protein: result.protein,
-      fat: result.fat,
-      carbs: result.carbs,
-      servingSize: result.servingSize,
+      nutrients: result.nutrients,
       description: result.description,
       brand: result.brand,
       imageDataUrl: capturedImage ?? undefined,
@@ -57,7 +53,7 @@
     result = null
     capturedImage = null
     error = ""
-    state = "idle"
+    cameraState = "idle"
   }
 </script>
 
@@ -68,11 +64,11 @@
 <div class="relative h-full">
   <Camera onPhotoCaptured={handleCapture} />
 
-  {#if state === "processing"}
+  {#if cameraState === "processing"}
     <LoadingOverlay message={statusMessage} />
   {/if}
 
-  {#if state === "result" && result}
+  {#if cameraState === "result" && result}
     <ResultCard
       {result}
       imageDataUrl={capturedImage ?? undefined}
@@ -81,7 +77,7 @@
     />
   {/if}
 
-  {#if state === "error"}
+  {#if cameraState === "error"}
     <div
       class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-zinc-950/95 p-8 backdrop-blur-sm"
       style="font-family: 'DM Mono', monospace;"

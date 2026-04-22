@@ -10,23 +10,23 @@
   }
 
   let {
-    servingSize = "2/3 cup (55g)",
-    servingsPerContainer = 8,
-    calories = 230,
-    totalFat = 8,
-    saturatedFat = 1,
+    servingSize = "",
+    servingsPerContainer = 0,
+    calories = 0,
+    totalFat = 0,
+    saturatedFat = 0,
     transFat = 0,
     cholesterol = 0,
-    sodium = 0.16,
-    totalCarbohydrate = 37,
-    dietaryFiber = 4,
-    totalSugars = 12,
-    addedSugars = 10,
-    protein = 3,
-    vitaminD = 0.000002,
-    calcium = 0.26,
-    iron = 0.008,
-    potassium = 0.235,
+    sodium = 0,
+    totalCarbohydrate = 0,
+    dietaryFiber = 0,
+    totalSugars = 0,
+    addedSugars = 0,
+    protein = 30,
+    vitaminD = 0,
+    calcium = 0,
+    iron = 0,
+    potassium = 0,
   }: NutritionProps = $props()
 
   function pct(key: NutrientKey, consumed: number): number {
