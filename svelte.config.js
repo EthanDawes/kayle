@@ -13,7 +13,12 @@ const config = {
       return isExternalLibrary ? undefined : true
     },
   },
-  kit: { adapter: adapter({ fallback: "index.html" }) },
+  kit: {
+    adapter: adapter({ fallback: "index.html" }),
+    paths: {
+      base: process.argv.includes("dev") ? "/BASE_PATH" : process.env.BASE_PATH,
+    },
+  },
 }
 
 export default config
