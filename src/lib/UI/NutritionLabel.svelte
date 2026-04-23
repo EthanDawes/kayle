@@ -229,7 +229,7 @@
     background: #fff;
     color: #111;
     border: 3px solid #111;
-    width: 340px;
+    max-width: 340px;
     padding: 6px 8px 4px;
     user-select: none;
     box-shadow: 4px 4px 0 #111;

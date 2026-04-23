@@ -4,7 +4,8 @@ import { settings } from "$lib/stores/settings.svelte"
 import type { NutritionInfo } from "$lib/models/meal"
 
 export async function processBarcode(imageDataUrl: string): Promise<NutritionInfo> {
-  const barcode = await BarcodeService.detect(imageDataUrl)
+  // TODO: remove fallback. Only for testing since my computer camera cannot read barcodes
+  const barcode = (await BarcodeService.detect(imageDataUrl)) ?? "644209411856"
   if (!barcode) throw new Error("No barcode detected. Try holding the camera steady and closer.")
 
   const product = await fetchProduct(barcode, settings.openfoodfactsKey || undefined)
