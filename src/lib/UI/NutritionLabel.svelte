@@ -142,68 +142,49 @@
   ])
 </script>
 
-<div
-  class="w-85 border-[3px] border-zinc-900 bg-white px-2 pt-1.5 pb-1 font-['Barlow_Condensed',sans-serif] text-zinc-900 shadow-[4px_4px_0_#111] select-none"
->
+<div class="nutrition-label">
   <!-- Header -->
-  <div class="mb-0.5 border-b-10 border-zinc-900 pb-1">
-    <div class="text-[2.6rem] leading-none font-black tracking-[-0.5px]">Nutrition Facts</div>
-
-    <div class="flex flex-col gap-px text-[0.85rem] font-semibold">
+  <div class="header">
+    <div class="title">Nutrition Facts</div>
+    <div class="serving-info">
       <span>{servingsPerContainer} servings per container</span>
-
-      <div class="flex justify-between text-base font-bold">
-        <span>Serving size</span>
-        <span>{servingSize}</span>
+      <div class="serving-size-row">
+        <span class="serving-size-label">Serving size</span>
+        <span class="serving-size-val">{servingSize}</span>
       </div>
     </div>
   </div>
 
   <!-- Calories -->
-  <div class="flex items-end justify-between border-b-[5px] border-zinc-900 py-0.75 pb-1">
-    <div class="flex flex-col leading-tight">
-      <span class="barlow text-[0.72rem] font-semibold"> Amount per serving </span>
-      <span class="text-[1.6rem] font-extrabold">Calories</span>
+  <div class="calories-block">
+    <div class="calories-header">
+      <span class="amt-per">Amount per serving</span>
+      <span class="calories-word">Calories</span>
     </div>
-
-    <span class="text-[3.2rem] leading-none font-black">{calories}</span>
+    <span class="calories-num">{calories}</span>
   </div>
 
-  <!-- DV Header -->
-  <div class="barlow border-b border-zinc-900 py-0.5 text-right text-[0.72rem] font-bold">
-    % Daily Value*
-  </div>
+  <div class="dv-header">% Daily Value*</div>
 
   <!-- Main nutrients -->
   {#each mainRows as row}
     {@const p = pct(row.key, row.consumed)}
     {@const color = barColor(p)}
     <div
-      class={`relative min-h-6.5 overflow-hidden
-      ${
-        row.border === "thick"
-          ? "border-b-[5px] border-zinc-900"
-          : row.border === "none"
-            ? ""
-            : "border-b border-zinc-300"
-      }`}
-      style={`--bar-pct:${p}%; --bar-color:${color};`}
+      class="nutrient-row"
+      class:indent={row.indent}
+      class:sub={row.sub}
+      class:thick-border={row.border === "thick"}
+      style="--bar-pct: {p}%; --bar-color: {color};"
     >
-      <div
-        class="absolute inset-0 w-(--bar-pct) bg-(--bar-color) opacity-20 transition-all duration-500"
-      ></div>
-
-      <div
-        class={`relative z-10 flex items-center justify-between py-0.75 pr-0.5
-        ${row.sub ? "pl-8" : row.indent ? "pl-4.5" : "pl-1"}`}
-      >
-        <span class={row.bold ? "text-base font-extrabold" : "barlow text-[0.9rem] font-semibold"}>
+      <div class="bar-bg"></div>
+      <div class="row-content">
+        <span class="nutrient-name" class:bold={row.bold}>
           {row.label}
-          <span class="font-bold"> {fmt(row.consumed, row.unit)}</span>
+          <span class="amount"> {fmt(row.consumed, row.unit)}</span>
         </span>
-
         {#if DAILY_VALUES[row.key] > 0}
-          <span class="text-[0.78rem] font-bold whitespace-nowrap text-zinc-800">
+          <span class="dv-text">
             {fmt(row.consumed, row.unit)} / {dvFmt(row.key, row.unit)}
           </span>
         {/if}
@@ -212,27 +193,21 @@
   {/each}
 
   <!-- Divider -->
-  <div class="border-b-8 border-zinc-900"></div>
+  <div class="thick-divider"></div>
 
   <!-- Micronutrients -->
   {#each microRows as row}
     {@const p = pct(row.key, row.consumed)}
     {@const color = barColor(p)}
-
     <div
-      class={`relative min-h-6.5 overflow-hidden ${
-        row.border === "none" ? "" : "border-b border-zinc-300"
-      }`}
-      style={`--bar-pct:${p}%; --bar-color:${color};`}
+      class="nutrient-row micro"
+      style="--bar-pct: {p}%; --bar-color: {color};"
+      class:no-border={row.border === "none"}
     >
-      <div
-        class="absolute inset-0 w-(--bar-pct) bg-(--bar-color) opacity-20 transition-all duration-500"
-      ></div>
-
-      <div class="relative z-10 flex items-center justify-between px-1 py-0.75">
-        <span class="text-[0.95rem] font-bold">{row.label}</span>
-
-        <span class="text-[0.78rem] font-bold whitespace-nowrap text-zinc-800">
+      <div class="bar-bg"></div>
+      <div class="row-content">
+        <span class="nutrient-name">{row.label}</span>
+        <span class="dv-text">
           {fmt(row.consumed, row.unit)} / {dvFmt(row.key, row.unit)}
         </span>
       </div>
@@ -240,16 +215,184 @@
   {/each}
 
   <!-- Footer note -->
-  <p
-    class="barlow mt-1 border-t-[3px] border-zinc-900 pt-1 text-[0.62rem] leading-[1.3] text-zinc-700"
-  >
+  <p class="footnote">
     * The % Daily Value (DV) tells you how much a nutrient in a serving of food contributes to a
     daily diet. 2,000 calories a day is used for general nutrition advice.
   </p>
 </div>
 
 <style>
-  .barlow {
+  @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;600&display=swap");
+
+  .nutrition-label {
+    font-family: "Barlow Condensed", sans-serif;
+    background: #fff;
+    color: #111;
+    border: 3px solid #111;
+    width: 340px;
+    padding: 6px 8px 4px;
+    user-select: none;
+    box-shadow: 4px 4px 0 #111;
+  }
+
+  /* ── Header ───────────────────────────────────── */
+  .header {
+    border-bottom: 10px solid #111;
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+  }
+
+  .title {
+    font-size: 2.6rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .serving-info {
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .serving-size-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  /* ── Calories ─────────────────────────────────── */
+  .calories-block {
+    border-bottom: 5px solid #111;
+    padding: 3px 0 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .calories-header {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .amt-per {
+    font-size: 0.72rem;
+    font-weight: 600;
     font-family: "Barlow", sans-serif;
+  }
+
+  .calories-word {
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+
+  .calories-num {
+    font-size: 3.2rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* ── DV header ────────────────────────────────── */
+  .dv-header {
+    text-align: right;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: "Barlow", sans-serif;
+    border-bottom: 1px solid #111;
+    padding: 2px 0;
+    margin-bottom: 0;
+  }
+
+  /* ── Nutrient rows ────────────────────────────── */
+  .nutrient-row {
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    overflow: hidden;
+    min-height: 26px;
+  }
+
+  .nutrient-row.thick-border {
+    border-bottom: 5px solid #111;
+  }
+
+  .nutrient-row.no-border {
+    border-bottom: none;
+  }
+
+  /* The progress bar fills from left */
+  .bar-bg {
+    position: absolute;
+    inset: 0;
+    width: var(--bar-pct);
+    background: var(--bar-color);
+    opacity: 0.18;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .row-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 2px 3px 4px;
+  }
+
+  .nutrient-row.indent .row-content {
+    padding-left: 18px;
+  }
+
+  .nutrient-row.sub .row-content {
+    padding-left: 32px;
+  }
+
+  .nutrient-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: "Barlow", sans-serif;
+  }
+
+  .nutrient-name.bold {
+    font-weight: 800;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1rem;
+  }
+
+  .amount {
+    font-weight: 700;
+  }
+
+  .dv-text {
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-family: "Barlow Condensed", sans-serif;
+    white-space: nowrap;
+    color: #222;
+  }
+
+  /* ── Micronutrients ───────────────────────────── */
+  .thick-divider {
+    border-bottom: 8px solid #111;
+  }
+
+  .nutrient-row.micro .nutrient-name {
+    font-weight: 700;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 0.95rem;
+  }
+
+  /* ── Footnote ─────────────────────────────────── */
+  .footnote {
+    font-family: "Barlow", sans-serif;
+    font-size: 0.62rem;
+    line-height: 1.3;
+    border-top: 3px solid #111;
+    margin-top: 4px;
+    padding-top: 4px;
+    color: #333;
   }
 </style>
