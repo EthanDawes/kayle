@@ -1,4 +1,4 @@
-import { getLocations, getMenus, type DiningLocation } from "$lib/integrations/hfsGraphQL"
+import { getLocations, getMenu } from "$lib/integrations/hfsGraphQL"
 import type { Coordinates } from "./LocationService"
 
 function distance(a: Coordinates, b: DiningLocation): number {
@@ -18,15 +18,18 @@ export const DiningCourtService = {
 
     const nearest = locations.reduce((a, b) => (distance(coords, a) < distance(coords, b) ? a : b))
 
-    const today = new Date().toISOString().split("T")[0]
-    const menus = await getMenus(nearest.name, today).catch(() => [])
+    const menuItems = await getMenu(nearest.name).catch(() => [])
 
-    if (!menus.length) return `Nearest dining court: ${nearest.name}`
+    // AI model doesn't care about dining court name
+    if (!menuItems.length) return ""
 
-    const items = menus
-      .flatMap((m) => m.stations.flatMap((s) => s.items.map((i) => i.name)))
-      .slice(0, 40)
+    const items = menuItems.map(
+      (item) =>
+        item.name +
+        ": " +
+        (item.nutritionFacts?.find((fact) => fact.name === "Serving Size")?.label ?? ""),
+    )
 
-    return `Dining court: ${nearest.name}\nCurrent menu items: ${items.join(", ")}`
+    return items.join("\n")
   },
 }

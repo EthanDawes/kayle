@@ -35,7 +35,7 @@ export async function getLocations() {
     .filter((court) => court.dailyMenu.length > 0)
 }
 
-export async function getMenus(location: string) {
+export async function getMenu(location: string) {
   const now = new Date()
   const data = await sdk.getMenu({ date: now.toISOString().split("T")[0], location })
   const currentMeals = getCurrentMeals(data.diningCourtByName?.dailyMenu?.meals, now)

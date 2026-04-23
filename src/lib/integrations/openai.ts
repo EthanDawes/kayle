@@ -31,10 +31,16 @@ export interface Nutrients {
   calcium: number
   iron: number
   potassium: number
-}` + menuContext
-      ? `\nThis food may be from a dining hall. Context:\n${menuContext}\nMatch the item if possible for better accuracy.`
-      : "",
+}`,
     "\nReturn only valid JSON, no markdown fences.",
+  ].join("\n")
+
+  const altPrompt = [
+    "Here are some foods and their serving sizes:",
+    menuContext,
+    "",
+    "Now, analyze the food in this image and respond with a JSON object mapping the food items you see with a multiple of its serving size.",
+    "Return only valid JSON, no markdown fences.",
   ].join("\n")
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -44,7 +50,7 @@ export interface Nutrients {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o",
+      model: "gpt-5.4-mini", // o4 is faster, but did not use proper units. Maybe ok if only need to recognise portions though
       messages: [
         {
           role: "user",
