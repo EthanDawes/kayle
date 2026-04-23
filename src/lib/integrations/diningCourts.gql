@@ -1,0 +1,17 @@
+query diningCourts($date: Date!) {
+  diningCourts {
+    id
+    name
+    latitude
+    longitude
+    category
+    dailyMenu(date: $date) {
+      meals {
+        name
+        type
+        startTime
+        endTime
+      }
+    }
+  }
+}
