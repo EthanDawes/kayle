@@ -60,12 +60,19 @@ export async function getMenu(location: string) {
     meal.stations.flatMap((station) =>
       station.items.flatMap((entry) => [
         entry.item,
-        ...(entry.components ?? []).map((component) => component.item).filter(Boolean),
+        ...(entry.components ?? []).map((component) => component.item),
       ]),
     ),
   )
 
-  return items
+  // Don't include items with no nutrition facts
+  return items.filter(
+    (
+      item,
+    ): item is typeof item & {
+      nutritionFacts: NonNullable<typeof item.nutritionFacts>
+    } => item.nutritionFacts != null,
+  )
 }
 
 export async function getAllFoods(): Promise<Record<string, string[]>> {
