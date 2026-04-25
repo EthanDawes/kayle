@@ -5,9 +5,13 @@
   import MealCard from "$lib/UI/MealCard.svelte"
   import Spinner from "$lib/UI/components/Spinner.svelte"
   import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
+  import { LLMService } from "$lib/services/LLMService"
+  import { settings } from "$lib/stores/settings.svelte"
+  import Markdown from "svelte-markdown"
 
   let overview = $state<DayOverview | null>(null)
   let loading = $state(true)
+  let suggestedMeal = $state("")
 
   async function load() {
     loading = true
@@ -48,6 +52,18 @@
     <div class="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">
       <div class="h-full w-full shrink-0 snap-start">
         <!-- Day summary page -->
+
+        <button
+          class="mb-2 cursor-pointer border"
+          onclick={() =>
+            LLMService.suggestMeals(settings.openaiKey).then((meal) => (suggestedMeal = meal))}
+        >
+          Suggest meals
+        </button>
+        <div class="md">
+          <Markdown source={suggestedMeal} />
+        </div>
+
         {#if overview.meals.length > 0}
           <NutritionLabel {...overview.nutrients} />
         {:else}
@@ -66,3 +82,14 @@
     </div>
   {/if}
 </div>
+
+<style>
+  :global(.md ul) {
+    list-style-type: circle;
+    list-style-position: inside;
+    font-size: small;
+  }
+  :global(.md li) {
+    margin-bottom: 0.5rem;
+  }
+</style>

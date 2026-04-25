@@ -1,8 +1,15 @@
 export async function analyzeImage(
   apiKey: string,
-  imageDataUrl: string,
+  imageDataUrl: string | null,
   prompt: string,
 ): Promise<any> {
+  const conversation = [
+    { type: "text", text: prompt },
+    { type: "image_url", image_url: { url: imageDataUrl, detail: "low" } },
+  ]
+  if (imageDataUrl === null) conversation.pop()
+  const response_format = imageDataUrl ? { type: "json_object" } : undefined
+
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -14,13 +21,10 @@ export async function analyzeImage(
       messages: [
         {
           role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image_url", image_url: { url: imageDataUrl, detail: "low" } },
-          ],
+          content: conversation,
         },
       ],
-      response_format: { type: "json_object" },
+      response_format,
       // max_tokens: 256,
     }),
   })
@@ -36,7 +40,7 @@ export async function analyzeImage(
   const content: string | undefined = data.choices?.[0]?.message?.content
   if (!content) throw new Error("Empty response from OpenAI")
 
-  const parsed = JSON.parse(content)
+  const parsed = imageDataUrl ? JSON.parse(content) : content
   console.log(parsed)
   return parsed
 }

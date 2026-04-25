@@ -55,3 +55,18 @@ export async function getMenu(location: string) {
   )
   return items
 }
+
+export async function getAllFoods(): Promise<Record<string, string[]>> {
+  const now = new Date()
+  const data = await sdk.allFoods({ date: now.toISOString().split("T")[0] })
+  return Object.fromEntries(
+    data.diningCourts!.map((court) => [
+      court?.name,
+      getCurrentMeals(court!.dailyMenu!.meals, now).flatMap((meal) =>
+        meal.stations.flatMap((station) => station.items.map((item) => item.item.name)),
+      ),
+    ]),
+  )
+}
+
+globalThis.getAllFoods = getAllFoods

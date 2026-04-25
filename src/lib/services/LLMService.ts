@@ -1,3 +1,4 @@
+import { getAllFoods } from "$lib/integrations/hfsGraphQL"
 import { analyzeImage } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 
@@ -58,5 +59,19 @@ export const LLMService = {
     ].join("\n")
 
     return await analyzeImage(apiKey, imageDataUrl, prompt)
+  },
+
+  async suggestMeals(apiKey: string) {
+    const menuContext = JSON.stringify(await getAllFoods())
+
+    const prompt = [
+      "Suggest 3 nutritious, balanced meals following the USDA myplate guidelines. All the items for one meal must come from the same location.",
+      "",
+      menuContext,
+      "",
+      "Describe each meal in 1 sentence, each on its own bullet point. This is all for the same meal period",
+    ].join("\n")
+
+    return (await analyzeImage(apiKey, null, prompt)) as string
   },
 }

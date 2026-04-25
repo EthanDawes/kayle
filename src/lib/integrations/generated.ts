@@ -869,6 +869,13 @@ export type User = Node & {
   userId: Scalars['String']['output'];
 };
 
+export type AllFoodsQueryVariables = Exact<{
+  date: Scalars['Date']['input'];
+}>;
+
+
+export type AllFoodsQuery = { __typename?: 'MenusQuery', diningCourts?: Array<{ __typename?: 'DiningCourt', name: string, dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', startTime?: any | null, endTime?: any | null, stations: Array<{ __typename?: 'Station', items: Array<{ __typename?: 'ItemAppearance', item: { __typename?: 'Item', name: string } }> }> }> } | null } | null> | null };
+
 export type DiningCourtsQueryVariables = Exact<{
   date: Scalars['Date']['input'];
 }>;
@@ -885,6 +892,26 @@ export type GetMenuQueryVariables = Exact<{
 export type GetMenuQuery = { __typename?: 'MenusQuery', diningCourtByName?: { __typename?: 'DiningCourt', dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', startTime?: any | null, endTime?: any | null, stations: Array<{ __typename?: 'Station', items: Array<{ __typename?: 'ItemAppearance', item: { __typename?: 'Item', name: string, nutritionFacts?: Array<{ __typename?: 'NutritionFact', name?: string | null, label?: string | null, value?: number | null }> | null } }> }> }> } | null } | null };
 
 
+export const AllFoodsDocument = gql`
+    query allFoods($date: Date!) {
+  diningCourts {
+    name
+    dailyMenu(date: $date) {
+      meals {
+        startTime
+        endTime
+        stations {
+          items {
+            item {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
 export const DiningCourtsDocument = gql`
     query diningCourts($date: Date!) {
   diningCourts {
@@ -935,6 +962,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    allFoods(variables: AllFoodsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<AllFoodsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<AllFoodsQuery>({ document: AllFoodsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'allFoods', 'query', variables);
+    },
     diningCourts(variables: DiningCourtsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<DiningCourtsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<DiningCourtsQuery>({ document: DiningCourtsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'diningCourts', 'query', variables);
     },

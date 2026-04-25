@@ -1,0 +1,18 @@
+query allFoods($date: Date!) {
+  diningCourts {
+    name
+    dailyMenu(date: $date) {
+      meals {
+        startTime
+        endTime
+        stations {
+          items {
+            item {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
