@@ -1,9 +1,16 @@
 import { GraphQLClient } from "graphql-request"
-import { getSdk, type DiningCourt, type DiningCourtsQuery, type GetMenuQuery } from "./generated"
+import { getSdk } from "./generated"
 
 const client = new GraphQLClient("https://api.hfs.purdue.edu/menus/v3/GraphQL")
 
 export const sdk = getSdk(client)
+
+export interface DiningCourtLocation {
+  name: string
+  latitude: number | null
+  longitude: number | null
+  category: string
+}
 
 function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
   meals: T[] | null | undefined,
@@ -33,6 +40,10 @@ export async function getLocations() {
       }
     })
     .filter((court) => court.dailyMenu.length > 0)
+}
+
+export async function getDiningCourts(): Promise<DiningCourtLocation[]> {
+  return (await getLocations()) as DiningCourtLocation[]
 }
 
 export async function getMenu(location: string) {

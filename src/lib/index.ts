@@ -6,6 +6,7 @@ export const MCG = MG / 1000
 
 // Daily Values reference (in grams unless noted)
 export const DAILY_VALUES = {
+  servingSize: "",
   calories: 2000,
   totalFat: 78,
   saturatedFat: 20,

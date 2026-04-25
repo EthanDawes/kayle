@@ -21,7 +21,7 @@ export async function analyzeImage(
         },
       ],
       response_format: { type: "json_object" },
-      max_tokens: 256,
+      // max_tokens: 256,
     }),
   })
 

@@ -15,7 +15,9 @@ export async function processFoodPhoto(
 
   if (diningCourt) {
     const menuNutrition = await DiningCourtService.getMenuNutrition(diningCourt)
+    console.log(menuNutrition)
     const menuContext = DiningCourtService.getServingSizesContext(menuNutrition)
+    console.log(menuContext)
     const servingAnalysis = await LLMService.analyzeDiningCourtMeal(
       settings.openaiKey,
       imageDataUrl,
@@ -27,10 +29,11 @@ export async function processFoodPhoto(
         DiningCourtService.multiplyNutrients(menuNutrition[key], value),
       )
     }, {} as Nutrients)
+    console.log(nutrients)
     analysis = { description: servingAnalysis.description, nutrients }
   } else {
     analysis = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl)
   }
 
-  return { ...analysis, source: "openai", name: "Meal TODO" }
+  return { ...analysis, source: "openai", name: diningCourt + " Meal" }
 }

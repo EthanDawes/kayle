@@ -4,13 +4,13 @@
   import { page } from "$app/state"
   import { resolve } from "$app/paths"
 
-  let { children } = $props()
-
   const nav = [
     { href: "/", label: "Today", icon: "◉" },
     { href: "/scan", label: "Scan", icon: "⊙" },
     { href: "/settings", label: "Settings", icon: "⚙" },
-  ]
+  ] as const
+
+  let { children } = $props()
 </script>
 
 <svelte:head>

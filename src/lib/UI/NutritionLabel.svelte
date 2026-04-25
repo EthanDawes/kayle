@@ -2,7 +2,7 @@
   import { DAILY_VALUES } from "$lib"
   import type { Nutrients } from "$lib/models/meal"
 
-  type NutrientKey = keyof typeof DAILY_VALUES
+  type NutrientKey = Exclude<keyof typeof DAILY_VALUES, "servingSize">
 
   interface NutritionProps extends Nutrients {
     servingSize?: string

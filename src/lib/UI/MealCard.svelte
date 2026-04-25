@@ -11,7 +11,7 @@
   const time = $derived(
     new Date(meal.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   )
-  const icon = $derived(meal.mode === "barcode" ? "📦" : "🍽")
+  const icon = $derived(meal.source === "openfoodfacts" ? "📦" : "🍽")
 </script>
 
 <div class="flex items-center gap-3 rounded-2xl p-4" style="font-family: 'DM Mono', monospace;">
@@ -30,14 +30,16 @@
   <div class="min-w-0 flex-1">
     <p class="truncate text-sm font-semibold text-white">{meal.name}</p>
     <p class="text-xs text-zinc-500">
-      {time}{meal.servingSize ? ` · ${meal.servingSize}` : ""}
+      {time}{meal.nutrients.servingSize ? ` · ${meal.nutrients.servingSize}` : ""}
     </p>
-    {#if meal.calories != null}
+    {#if meal.nutrients.calories != null}
       <p class="mt-0.5 text-xs text-zinc-400">
-        {Math.round(meal.calories)} kcal
-        {#if meal.protein != null}· P {meal.protein.toFixed(0)}g{/if}
-        {#if meal.carbs != null}· C {meal.carbs.toFixed(0)}g{/if}
-        {#if meal.fat != null}· F {meal.fat.toFixed(0)}g{/if}
+        {Math.round(meal.nutrients.calories)} kcal
+        {#if meal.nutrients.protein != null} · P {meal.nutrients.protein.toFixed(0)}g{/if}
+        {#if meal.nutrients.totalCarbohydrate != null}
+          · C {meal.nutrients.totalCarbohydrate.toFixed(0)}g
+        {/if}
+        {#if meal.nutrients.totalFat != null} · F {meal.nutrients.totalFat.toFixed(0)}g{/if}
       </p>
     {/if}
   </div>

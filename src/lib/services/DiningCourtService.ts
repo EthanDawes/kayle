@@ -4,12 +4,33 @@ import type { Nutrients } from "$lib/models/meal"
 import type { Coordinates } from "./LocationService"
 
 export type FoodNutrients = Record<string, Nutrients>
+type NumericNutrientKey = Exclude<keyof Nutrients, "servingSize">
+const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
+  "calories",
+  "totalFat",
+  "saturatedFat",
+  "transFat",
+  "cholesterol",
+  "sodium",
+  "totalCarbohydrate",
+  "dietaryFiber",
+  "totalSugars",
+  "addedSugars",
+  "protein",
+  "vitaminD",
+  "vitaminC",
+  "calcium",
+  "iron",
+  "potassium",
+]
 
 interface DiningLocation {
   latitude: number
   longitude: number
   name: string
 }
+
+export const MAX_AUTO_SELECT_DISTANCE_METERS = 250
 
 function distance(a: Coordinates, b: DiningLocation): number {
   const R = 6_371_000
@@ -45,7 +66,10 @@ const asGrams = (name: string, value: number): number => {
 
 export const toNutrients = (items: SourceNutrient[]): Nutrients =>
   items.reduce<Nutrients>((acc, item) => {
-    if (item.value == null) return acc
+    if (item.name?.toLowerCase() === "serving size") {
+      acc.servingSize = item.label!
+    }
+    if (item.name == null || item.value == null) return acc
 
     const v = item.name.toLowerCase() === "calories" ? item.value : asGrams(item.name, item.value)
 
@@ -121,22 +145,29 @@ export const DiningCourtService = {
   },
 
   multiplyNutrients(nutrients: Nutrients, scalar: number) {
-    for (let key in nutrients) {
-      if (key != "servingSize") nutrients[k] = nutrients[k]! * scalar
+    for (const key of NUMERIC_NUTRIENT_KEYS) {
+      if (nutrients[key] != null) nutrients[key] *= scalar
     }
     return nutrients
   },
 
   addNutrients(nut1: Nutrients, nut2: Nutrients) {
-    for (const key in nut1) {
-      if (key != "servingSize") nut1[key] = (nut1[key] ?? 0) + (nut2[key] ?? 0)
+    for (const key of NUMERIC_NUTRIENT_KEYS) {
+      const value = (nut1[key] ?? 0) + (nut2[key] ?? 0)
+      if (value !== 0) nut1[key] = value
     }
     return nut1
   },
 
-  async getNearestCourt(locations: DiningLocation[], coords: Coordinates): Promise<string> {
+  async getNearestCourt(
+    locations: DiningLocation[],
+    coords: Coordinates,
+    maxDistanceMeters = Number.POSITIVE_INFINITY,
+  ): Promise<string> {
     if (!locations.length) return ""
 
-    return locations.reduce((a, b) => (distance(coords, a) < distance(coords, b) ? a : b)).name!
+    const nearest = locations.reduce((a, b) => (distance(coords, a) < distance(coords, b) ? a : b))
+
+    return distance(coords, nearest) <= maxDistanceMeters ? nearest.name! : ""
   },
 }
