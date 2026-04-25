@@ -59,7 +59,7 @@
         {/if}
       </div>
       {#each overview.meals.toReversed() as meal (meal.id)}
-        <div class="h-full w-full shrink-0 snap-start bg-blue-500">
+        <div class="h-full w-full shrink-0 snap-start">
           <MealCard {meal} onDelete={deleteMeal} />
         </div>
       {/each}
