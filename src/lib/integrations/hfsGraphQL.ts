@@ -1,7 +1,7 @@
 import { GraphQLClient } from "graphql-request"
 import { getSdk } from "./generated"
 
-const client = new GraphQLClient("https://api.hfs.purdue.edu/menus/v3/GraphQL")
+const client = new GraphQLClient("https://kayle.ethand-python.workers.dev")
 
 export const sdk = getSdk(client)
 
