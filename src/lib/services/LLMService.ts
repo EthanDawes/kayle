@@ -1,5 +1,5 @@
 import { getAllFoods } from "$lib/integrations/hfsGraphQL"
-import { analyzeImage } from "$lib/integrations/openai"
+import { analyzeImage, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 
 export interface FoodAnalysis {
@@ -72,6 +72,6 @@ export const LLMService = {
       "Describe each meal in 1 sentence, each on its own bullet point. This is all for the same meal period",
     ].join("\n")
 
-    return (await analyzeImage(apiKey, null, prompt)) as string
+    return askAI(apiKey, prompt)
   },
 }

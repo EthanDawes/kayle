@@ -35,7 +35,11 @@
 
   async function loadSuggestedMeals() {
     loadingSuggestions = true
-    suggestedMeal = await LLMService.suggestMeals(settings.openaiKey)
+    try {
+      suggestedMeal = await LLMService.suggestMeals(settings.openaiKey)
+    } catch (err) {
+      alert(err)
+    }
     loadingSuggestions = false
   }
 </script>
