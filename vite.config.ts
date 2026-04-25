@@ -40,6 +40,7 @@ export default defineConfig({
       },
       registerType: "autoUpdate",
       includeAssets: ["img/*"],
+      scope: "/kayle",
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
