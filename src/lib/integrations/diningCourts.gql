@@ -1,6 +1,5 @@
 query diningCourts($date: Date!) {
   diningCourts {
-    id
     name
     latitude
     longitude

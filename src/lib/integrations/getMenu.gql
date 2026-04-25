@@ -1,21 +1,12 @@
 query getMenu($location: String!, $date: Date!) {
   diningCourtByName(name: $location) {
-    id
-    name
     dailyMenu(date: $date) {
       meals {
-        name
-        type
         startTime
         endTime
         stations {
-          name
           items {
-            itemMenuId
-            displayName
             item {
-              id
-              itemId
               name
               nutritionFacts {
                 name

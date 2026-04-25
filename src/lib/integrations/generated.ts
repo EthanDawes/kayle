@@ -874,7 +874,7 @@ export type DiningCourtsQueryVariables = Exact<{
 }>;
 
 
-export type DiningCourtsQuery = { __typename?: 'MenusQuery', diningCourts?: Array<{ __typename?: 'DiningCourt', id: string, name: string, latitude?: number | null, longitude?: number | null, category: string, dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', name: string, type: MealType, startTime?: any | null, endTime?: any | null }> } | null } | null> | null };
+export type DiningCourtsQuery = { __typename?: 'MenusQuery', diningCourts?: Array<{ __typename?: 'DiningCourt', name: string, latitude?: number | null, longitude?: number | null, category: string, dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', name: string, type: MealType, startTime?: any | null, endTime?: any | null }> } | null } | null> | null };
 
 export type GetMenuQueryVariables = Exact<{
   location: Scalars['String']['input'];
@@ -882,13 +882,12 @@ export type GetMenuQueryVariables = Exact<{
 }>;
 
 
-export type GetMenuQuery = { __typename?: 'MenusQuery', diningCourtByName?: { __typename?: 'DiningCourt', id: string, name: string, dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', name: string, type: MealType, startTime?: any | null, endTime?: any | null, stations: Array<{ __typename?: 'Station', name?: string | null, items: Array<{ __typename?: 'ItemAppearance', itemMenuId: any, displayName: string, item: { __typename?: 'Item', id: string, itemId: any, name: string, nutritionFacts?: Array<{ __typename?: 'NutritionFact', name?: string | null, label?: string | null, value?: number | null }> | null } }> }> }> } | null } | null };
+export type GetMenuQuery = { __typename?: 'MenusQuery', diningCourtByName?: { __typename?: 'DiningCourt', dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', startTime?: any | null, endTime?: any | null, stations: Array<{ __typename?: 'Station', items: Array<{ __typename?: 'ItemAppearance', item: { __typename?: 'Item', name: string, nutritionFacts?: Array<{ __typename?: 'NutritionFact', name?: string | null, label?: string | null, value?: number | null }> | null } }> }> }> } | null } | null };
 
 
 export const DiningCourtsDocument = gql`
     query diningCourts($date: Date!) {
   diningCourts {
-    id
     name
     latitude
     longitude
@@ -907,22 +906,13 @@ export const DiningCourtsDocument = gql`
 export const GetMenuDocument = gql`
     query getMenu($location: String!, $date: Date!) {
   diningCourtByName(name: $location) {
-    id
-    name
     dailyMenu(date: $date) {
       meals {
-        name
-        type
         startTime
         endTime
         stations {
-          name
           items {
-            itemMenuId
-            displayName
             item {
-              id
-              itemId
               name
               nutritionFacts {
                 name
