@@ -12,6 +12,7 @@
   let overview = $state<DayOverview | null>(null)
   let loading = $state(true)
   let suggestedMeal = $state("")
+  let loadingSuggestions = $state(false)
 
   async function load() {
     loading = true
@@ -31,6 +32,12 @@
     month: "long",
     day: "numeric",
   })
+
+  async function loadSuggestedMeals() {
+    loadingSuggestions = true
+    suggestedMeal = await LLMService.suggestMeals(settings.openaiKey)
+    loadingSuggestions = false
+  }
 </script>
 
 <svelte:head>
@@ -53,12 +60,11 @@
       <div class="h-full w-full shrink-0 snap-start">
         <!-- Day summary page -->
 
-        <button
-          class="mb-2 cursor-pointer border"
-          onclick={() =>
-            LLMService.suggestMeals(settings.openaiKey).then((meal) => (suggestedMeal = meal))}
-        >
+        <button class="mb-2 cursor-pointer border" onclick={loadSuggestedMeals}>
           Suggest meals
+          {#if loadingSuggestions}
+            <Spinner style="width: 10px; height: 10px" />
+          {/if}
         </button>
         <div class="md">
           <Markdown source={suggestedMeal} />
