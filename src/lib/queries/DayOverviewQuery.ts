@@ -1,25 +1,23 @@
 import { MealRepository } from "$lib/repositories/MealRepository"
-import type { Meal } from "$lib/models/meal"
+import type { Meal, Nutrients } from "$lib/models/meal"
+import { DiningCourtService } from "$lib/services/DiningCourtService"
 
 export interface DayOverview {
   meals: Meal[]
-  totalCalories: number
-  totalProtein: number
-  totalFat: number
-  totalCarbs: number
-  mealCount: number
+  nutrients: Nutrients
 }
 
 export const DayOverviewQuery = {
   async forDate(date: string): Promise<DayOverview> {
     const meals = await MealRepository.getByDate(date)
+    const summary = meals.reduce(
+      (sum, meal) => DiningCourtService.addNutrients(sum, meal.nutrients),
+      {} as Nutrients,
+    )
+
     return {
       meals,
-      totalCalories: meals.reduce((s, m) => s + (m.nutrients.calories ?? 0), 0),
-      totalProtein: meals.reduce((s, m) => s + (m.nutrients.protein ?? 0), 0),
-      totalFat: meals.reduce((s, m) => s + (m.nutrients.totalFat ?? 0), 0),
-      totalCarbs: meals.reduce((s, m) => s + (m.nutrients.totalCarbohydrate ?? 0), 0),
-      mealCount: meals.length,
+      nutrients: summary,
     }
   },
 

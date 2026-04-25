@@ -49,7 +49,7 @@
       <div class="h-full w-full shrink-0 snap-start">
         <!-- Day summary page -->
         {#if overview.meals.length > 0}
-          <NutritionLabel />
+          <NutritionLabel {...overview.nutrients} />
         {:else}
           <div class="flex flex-col items-center gap-2 py-16 text-center">
             <span class="text-5xl">🍽</span>

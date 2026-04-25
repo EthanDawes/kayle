@@ -22,7 +22,7 @@
     dietaryFiber = 0,
     totalSugars = 0,
     addedSugars = 0,
-    protein = 30,
+    protein = 0,
     vitaminD = 0,
     calcium = 0,
     iron = 0,
