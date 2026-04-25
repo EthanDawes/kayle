@@ -9,6 +9,7 @@
 
   const nav = [
     { href: "/", label: "Today", icon: "◉" },
+    { href: "/trends", label: "Trends", icon: "📈" },
     { href: "/scan", label: "Scan", icon: "⊙" },
     { href: "/settings", label: "Settings", icon: "⚙" },
   ] as const

@@ -4,8 +4,8 @@ import type { Nutrients } from "$lib/models/meal"
 import type { Coordinates } from "./LocationService"
 
 export type FoodNutrients = Record<string, Nutrients>
-type NumericNutrientKey = Exclude<keyof Nutrients, "servingSize">
-const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
+export type NumericNutrientKey = Exclude<keyof Nutrients, "servingSize">
+export const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
   "calories",
   "totalFat",
   "saturatedFat",
@@ -23,6 +23,25 @@ const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
   "iron",
   "potassium",
 ]
+
+export const NUMERIC_NUTRIENT_LABELS: Record<NumericNutrientKey, string> = {
+  calories: "Calories",
+  totalFat: "Total Fat",
+  saturatedFat: "Saturated Fat",
+  transFat: "Trans Fat",
+  cholesterol: "Cholesterol",
+  sodium: "Sodium",
+  totalCarbohydrate: "Total Carbohydrate",
+  dietaryFiber: "Dietary Fiber",
+  totalSugars: "Total Sugars",
+  addedSugars: "Added Sugars",
+  protein: "Protein",
+  vitaminD: "Vitamin D",
+  vitaminC: "Vitamin C",
+  calcium: "Calcium",
+  iron: "Iron",
+  potassium: "Potassium",
+}
 
 interface DiningLocation {
   latitude: number

@@ -21,6 +21,10 @@ export const MealRepository = {
     return db.meals.where("date").equals(date).toArray()
   },
 
+  getBetweenDates(startDate: string, endDate: string): Promise<Meal[]> {
+    return db.meals.where("date").between(startDate, endDate, true, true).toArray()
+  },
+
   delete(id: number): Promise<void> {
     return db.meals.delete(id)
   },
