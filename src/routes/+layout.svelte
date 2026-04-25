@@ -10,7 +10,7 @@
     { href: "/", label: "Today", icon: "◉" },
     { href: "/scan", label: "Scan", icon: "⊙" },
     { href: "/settings", label: "Settings", icon: "⚙" },
-  ]
+  ] as const
 </script>
 
 <svelte:head>

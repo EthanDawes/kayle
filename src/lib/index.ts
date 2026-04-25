@@ -1,4 +1,5 @@
 import type { Nutrients } from "./models/meal"
+import type { NutrientKey } from "./models/nutrients"
 
 export const G = 1
 export const MG = G / 1000
@@ -22,4 +23,4 @@ export const DAILY_VALUES = {
   calcium: 1.3, // 1300mg → grams
   iron: 0.018, // 18mg → grams
   potassium: 4.7, // 4700mg → grams
-} satisfies Required<Nutrients>
+} satisfies Record<NutrientKey, number>
