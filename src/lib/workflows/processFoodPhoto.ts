@@ -35,5 +35,11 @@ export async function processFoodPhoto(
     analysis = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl)
   }
 
-  return { ...analysis, source: "openai", name: diningCourt + " Meal" }
+  const time = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  })
+
+  return { ...analysis, source: "openai", name: time + " " + diningCourt }
 }
