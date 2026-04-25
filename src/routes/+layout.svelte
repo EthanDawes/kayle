@@ -8,10 +8,9 @@
   import { onMount } from "svelte"
 
   const nav = [
-    { href: "/", label: "Today", icon: "◉" },
-    { href: "/trends", label: "Trends", icon: "📈" },
-    { href: "/scan", label: "Scan", icon: "⊙" },
-    { href: "/settings", label: "Settings", icon: "⚙" },
+    { href: "/", label: "Today", icon: "\u25c9" },
+    { href: "/scan", label: "Scan", icon: "\u2299" },
+    { href: "/settings", label: "Settings", icon: "\u2699" },
   ] as const
 
   // Adapted from https://vite-pwa-org.netlify.app/frameworks/sveltekit.html
