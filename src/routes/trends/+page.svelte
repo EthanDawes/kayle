@@ -137,18 +137,23 @@
     chartInstance = new ChartClass(canvas, config)
   }
 
+  function resetChart() {
+    chartInstance?.destroy()
+    chartInstance = null
+  }
+
   onMount(() => {
     mounted = true
 
     return () => {
       mounted = false
-      chartInstance?.destroy()
-      chartInstance = null
+      resetChart()
     }
   })
 
   $effect(() => {
     selectedNutrient
+    resetChart()
     void loadTrend()
   })
 
@@ -157,6 +162,7 @@
     values
     dailyValueLine
     chartLabel
+    canvas
     void syncChart()
   })
 </script>
@@ -204,7 +210,7 @@
         {error}
       </div>
     {:else}
-      <div class="h-72">
+      <div class="h-72 min-h-72">
         <canvas bind:this={canvas}></canvas>
       </div>
 
