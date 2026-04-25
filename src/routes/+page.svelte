@@ -7,16 +7,40 @@
   import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
   import { LLMService } from "$lib/services/LLMService"
   import { settings } from "$lib/stores/settings.svelte"
+  import { localISODate } from "$lib/integrations/hfsGraphQL"
   import Markdown from "svelte-markdown"
 
   let overview = $state<DayOverview | null>(null)
   let loading = $state(true)
   let suggestedMeal = $state("")
   let loadingSuggestions = $state(false)
+  let selectedDate = $state(DayOverviewQuery.today())
+
+  function addDays(date: string, amount: number) {
+    const nextDate = new Date(`${date}T00:00:00`)
+    nextDate.setDate(nextDate.getDate() + amount)
+    return localISODate(nextDate)
+  }
+
+  function formatDateLabel(date: string) {
+    return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    })
+  }
+
+  function titleForDate(date: string) {
+    if (date === DayOverviewQuery.today()) return "Today"
+    if (date === addDays(DayOverviewQuery.today(), -1)) return "Yesterday"
+    return formatDateLabel(date)
+  }
+
+  const canGoForward = $derived(selectedDate < DayOverviewQuery.today())
 
   async function load() {
     loading = true
-    overview = await DayOverviewQuery.forDate(DayOverviewQuery.today())
+    overview = await DayOverviewQuery.forDate(selectedDate)
     loading = false
   }
 
@@ -25,13 +49,16 @@
     await load()
   }
 
-  onMount(load)
+  async function goToPreviousDay() {
+    selectedDate = addDays(selectedDate, -1)
+    await load()
+  }
 
-  const todayLabel = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  })
+  async function goToNextDay() {
+    if (!canGoForward) return
+    selectedDate = addDays(selectedDate, 1)
+    await load()
+  }
 
   async function loadSuggestedMeals() {
     loadingSuggestions = true
@@ -42,6 +69,8 @@
     }
     loadingSuggestions = false
   }
+
+  onMount(load)
 </script>
 
 <svelte:head>
@@ -49,10 +78,32 @@
 </svelte:head>
 
 <div class="flex h-full w-full flex-col" style="font-family: 'DM Mono', monospace;">
-  <!-- Header -->
   <div class="pt-2">
-    <p class="text-xs tracking-[0.2em] text-zinc-500 uppercase">{todayLabel}</p>
-    <h1 class="text-2xl font-bold text-white">Today</h1>
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <p class="text-xs tracking-[0.2em] text-zinc-500 uppercase">
+          {formatDateLabel(selectedDate)}
+        </p>
+        <h1 class="text-2xl font-bold text-white">{titleForDate(selectedDate)}</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800"
+          onclick={goToPreviousDay}
+          aria-label="Show previous day"
+        >
+          <span aria-hidden="true">&larr;</span>
+        </button>
+        <button
+          class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+          onclick={goToNextDay}
+          disabled={!canGoForward}
+          aria-label="Show next day"
+        >
+          <span aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   {#if loading}
@@ -63,13 +114,14 @@
     <div class="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">
       <div class="h-full w-full shrink-0 snap-start">
         <!-- Day summary page -->
-
-        <button class="mb-2 cursor-pointer border" onclick={loadSuggestedMeals}>
-          Suggest meals
-          {#if loadingSuggestions}
-            <Spinner style="width: 10px; height: 10px" />
-          {/if}
-        </button>
+        {#if DayOverviewQuery.today() == selectedDate}
+          <button class="mb-2 cursor-pointer border" onclick={loadSuggestedMeals}>
+            Suggest meals
+            {#if loadingSuggestions}
+              <Spinner style="width: 10px; height: 10px" />
+            {/if}
+          </button>
+        {/if}
         <div class="md">
           <Markdown source={suggestedMeal} />
         </div>
@@ -78,7 +130,7 @@
           <NutritionLabel {...overview.nutrients} />
         {:else}
           <div class="flex flex-col items-center gap-2 py-16 text-center">
-            <span class="text-5xl">🍽</span>
+            <span class="text-5xl">&#127869;</span>
             <p class="text-sm text-zinc-500">Nothing logged yet.</p>
             <p class="text-xs text-zinc-600">Tap Scan to get started.</p>
           </div>
@@ -99,6 +151,7 @@
     list-style-position: inside;
     font-size: small;
   }
+
   :global(.md li) {
     margin-bottom: 0.5rem;
   }
