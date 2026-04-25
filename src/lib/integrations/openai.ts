@@ -1,8 +1,8 @@
-export async function requestJsonFromImage<T>(
+export async function analyzeImage(
   apiKey: string,
   imageDataUrl: string,
   prompt: string,
-): Promise<T> {
+): Promise<any> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -36,5 +36,7 @@ export async function requestJsonFromImage<T>(
   const content: string | undefined = data.choices?.[0]?.message?.content
   if (!content) throw new Error("Empty response from OpenAI")
 
-  return JSON.parse(content) as T
+  const parsed = JSON.parse(content)
+  console.log(parsed)
+  return parsed
 }

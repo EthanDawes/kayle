@@ -5,7 +5,6 @@ export interface Meal {
   name: string
   nutrients: Nutrients
   description?: string
-  servingSize?: string
   imageDataUrl?: string
   source?: "openfoodfacts" | "openai"
 }
@@ -14,12 +13,12 @@ export interface NutritionInfo {
   name: string
   nutrients: Nutrients
   description?: string
-  servingSize?: string
   source: "openfoodfacts" | "openai"
 }
 
 // All units are in grams
 export interface Nutrients {
+  servingSize?: string
   calories?: number
   totalFat?: number
   saturatedFat?: number

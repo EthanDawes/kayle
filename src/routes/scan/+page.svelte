@@ -13,7 +13,6 @@
 
   let cameraState = $state<ScanState>("idle")
   let capturedImage = $state<string | null>(null)
-  let capturedMode = $state<ScanMode>("food")
   let diningCourt = $state<string>("")
   let result = $state<NutritionInfo | null>(null)
   let error = $state("")
@@ -21,14 +20,11 @@
 
   async function handleCapture(photo: string, mode: ScanMode) {
     capturedImage = photo
-    capturedMode = mode
     cameraState = "processing"
     statusMessage = mode === "barcode" ? "Detecting barcode..." : "Analyzing food..."
 
     try {
-      result = await processScan(photo, mode, {
-        diningCourt: mode === "food" ? diningCourt.trim() || undefined : undefined,
-      })
+      result = await processScan(photo, mode)
       cameraState = "result"
     } catch (err) {
       error = err instanceof Error ? err.message : "Analysis failed. Please try again."
@@ -41,12 +37,9 @@
     await MealRepository.add({
       date: DayOverviewQuery.today(),
       timestamp: Date.now(),
-      mode: capturedMode,
       name: result.name,
       nutrients: result.nutrients,
       description: result.description,
-      brand: result.brand,
-      servingSize: result.servingSize,
       imageDataUrl: capturedImage ?? undefined,
       source: result.source,
     })
@@ -67,19 +60,6 @@
 
 <div class="relative h-full">
   <Camera onPhotoCaptured={handleCapture} />
-
-  {#if cameraState === "idle"}
-    <div class="pointer-events-none absolute top-4 right-4 left-4 z-30 flex justify-center">
-      <label class="pointer-events-auto w-full max-w-sm">
-        <span class="sr-only">Dining court</span>
-        <input
-          bind:value={diningCourt}
-          placeholder="Dining court"
-          class="w-full rounded-full border border-white/15 bg-black/45 px-4 py-2 text-sm text-white placeholder-white/45 shadow-lg backdrop-blur-md transition-colors outline-none focus:border-white/40"
-        />
-      </label>
-    </div>
-  {/if}
 
   {#if cameraState === "processing"}
     <LoadingOverlay message={statusMessage} />

@@ -4,15 +4,15 @@ import type { NutritionInfo } from "$lib/models/meal"
 
 type ScanMode = "food" | "barcode"
 
-interface ProcessScanOptions {
-  diningCourt?: string
+const processors = {
+  barcode: processBarcode,
+  food: processFoodPhoto,
 }
 
 export async function processScan(
   imageDataUrl: string,
   mode: ScanMode,
-  options: ProcessScanOptions = {},
+  court: string | undefined,
 ): Promise<NutritionInfo> {
-  if (mode === "barcode") return processBarcode(imageDataUrl)
-  return processFoodPhoto(imageDataUrl, { diningCourt: options.diningCourt })
+  return processors[mode](imageDataUrl, court)
 }

@@ -15,10 +15,10 @@ export const DayOverviewQuery = {
     const meals = await MealRepository.getByDate(date)
     return {
       meals,
-      totalCalories: meals.reduce((s, m) => s + (m.nutrients.calories ?? 0), 0),
-      totalProtein: meals.reduce((s, m) => s + (m.nutrients.protein ?? 0), 0),
-      totalFat: meals.reduce((s, m) => s + (m.nutrients.totalFat ?? 0), 0),
-      totalCarbs: meals.reduce((s, m) => s + (m.nutrients.totalCarbohydrate ?? 0), 0),
+      totalCalories: meals.reduce((s, m) => s + (m.calories ?? 0), 0),
+      totalProtein: meals.reduce((s, m) => s + (m.protein ?? 0), 0),
+      totalFat: meals.reduce((s, m) => s + (m.fat ?? 0), 0),
+      totalCarbs: meals.reduce((s, m) => s + (m.carbs ?? 0), 0),
       mealCount: meals.length,
     }
   },
