@@ -889,7 +889,7 @@ export type GetMenuQueryVariables = Exact<{
 }>;
 
 
-export type GetMenuQuery = { __typename?: 'MenusQuery', diningCourtByName?: { __typename?: 'DiningCourt', dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', startTime?: any | null, endTime?: any | null, stations: Array<{ __typename?: 'Station', items: Array<{ __typename?: 'ItemAppearance', item: { __typename?: 'Item', name: string, nutritionFacts?: Array<{ __typename?: 'NutritionFact', name?: string | null, label?: string | null, value?: number | null }> | null } }> }> }> } | null } | null };
+export type GetMenuQuery = { __typename?: 'MenusQuery', diningCourtByName?: { __typename?: 'DiningCourt', dailyMenu?: { __typename?: 'DailyMenu', meals: Array<{ __typename?: 'MealMenu', startTime?: any | null, endTime?: any | null, stations: Array<{ __typename?: 'Station', items: Array<{ __typename?: 'ItemAppearance', components?: Array<{ __typename?: 'ItemAppearance', item: { __typename?: 'Item', name: string, nutritionFacts?: Array<{ __typename?: 'NutritionFact', name?: string | null, label?: string | null, value?: number | null }> | null } }> | null, item: { __typename?: 'Item', name: string, nutritionFacts?: Array<{ __typename?: 'NutritionFact', name?: string | null, label?: string | null, value?: number | null }> | null } }> }> }> } | null } | null };
 
 
 export const AllFoodsDocument = gql`
@@ -939,6 +939,16 @@ export const GetMenuDocument = gql`
         endTime
         stations {
           items {
+            components {
+              item {
+                name
+                nutritionFacts {
+                  name
+                  label
+                  value
+                }
+              }
+            }
             item {
               name
               nutritionFacts {

@@ -6,6 +6,16 @@ query getMenu($location: String!, $date: Date!) {
         endTime
         stations {
           items {
+            components {
+              item {
+                name
+                nutritionFacts {
+                  name
+                  label
+                  value
+                }
+              }
+            }
             item {
               name
               nutritionFacts {

@@ -48,11 +48,23 @@ export async function getDiningCourts(): Promise<DiningCourtLocation[]> {
 
 export async function getMenu(location: string) {
   const now = new Date()
-  const data = await sdk.getMenu({ date: now.toISOString().split("T")[0], location })
+
+  const data = await sdk.getMenu({
+    date: now.toISOString().split("T")[0],
+    location,
+  })
+
   const currentMeals = getCurrentMeals(data.diningCourtByName?.dailyMenu?.meals, now)
+
   const items = currentMeals.flatMap((meal) =>
-    meal.stations.flatMap((station) => station.items.map((item) => item.item)),
+    meal.stations.flatMap((station) =>
+      station.items.flatMap((entry) => [
+        entry.item,
+        ...(entry.components ?? []).map((component) => component.item).filter(Boolean),
+      ]),
+    ),
   )
+
   return items
 }
 
