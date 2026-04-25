@@ -35,10 +35,14 @@
     return Math.min(100, Math.round((consumed / dv) * 100))
   }
 
+  function whole(value: number): number {
+    return Math.round(value)
+  }
+
   function fmt(grams: number, unit: "g" | "mg" | "mcg" = "g"): string {
-    if (unit === "mg") return `${Math.round(grams * 1000)}mg`
-    if (unit === "mcg") return `${Math.round(grams * 1_000_000)}mcg`
-    return `${grams}g`
+    if (unit === "mg") return `${whole(grams * 1000)}mg`
+    if (unit === "mcg") return `${whole(grams * 1_000_000)}mcg`
+    return `${whole(grams)}g`
   }
 
   function dvFmt(key: NutrientKey, unit: "g" | "mg" | "mcg" = "g"): string {
@@ -97,7 +101,14 @@
       bold: true,
       border: "thick",
     },
-    { label: "Sodium", key: "sodium", consumed: sodium, unit: "mg", bold: true, border: "thick" },
+    {
+      label: "Sodium",
+      key: "sodium",
+      consumed: sodium,
+      unit: "mg",
+      bold: true,
+      border: "thick",
+    },
     {
       label: "Total Carbohydrate",
       key: "totalCarbohydrate",
@@ -131,7 +142,14 @@
       sub: true,
       border: "thin",
     },
-    { label: "Protein", key: "protein", consumed: protein, unit: "g", bold: true, border: "thick" },
+    {
+      label: "Protein",
+      key: "protein",
+      consumed: protein,
+      unit: "g",
+      bold: true,
+      border: "thick",
+    },
   ])
 
   const microRows: Row[] = $derived([
@@ -147,7 +165,7 @@
   <div class="header">
     <div class="title">Nutrition Facts</div>
     <div class="serving-info">
-      <span>{servingsPerContainer} servings per container</span>
+      <span>{whole(servingsPerContainer)} servings per container</span>
       <div class="serving-size-row">
         <span class="serving-size-label">Serving size</span>
         <span class="serving-size-val">{servingSize}</span>
@@ -161,7 +179,7 @@
       <span class="amt-per">Amount per serving</span>
       <span class="calories-word">Calories</span>
     </div>
-    <span class="calories-num">{calories}</span>
+    <span class="calories-num">{whole(calories)}</span>
   </div>
 
   <div class="dv-header">% Daily Value*</div>
