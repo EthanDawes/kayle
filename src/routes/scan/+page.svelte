@@ -14,6 +14,7 @@
     DiningCourtService,
     MAX_AUTO_SELECT_DISTANCE_METERS,
   } from "$lib/services/DiningCourtService"
+  import { resolve } from "$app/paths"
 
   type ScanState = "idle" | "processing" | "result" | "error"
   type ScanMode = "food" | "barcode"
@@ -90,7 +91,7 @@
         source: result.source,
       }),
     )
-    goto("/")
+    goto(resolve("/"))
   }
 
   function reset() {
