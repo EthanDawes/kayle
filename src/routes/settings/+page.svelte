@@ -45,7 +45,7 @@
           type={showOpenai ? "text" : "password"}
           bind:value={openaiKey}
           placeholder="sk-..."
-          class="w-full rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
+          class="w-full rounded-xl px-4 py-3 pr-12 text-sm placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
         <button
           onclick={() => (showOpenai = !showOpenai)}
@@ -72,7 +72,7 @@
           type={showOff ? "text" : "password"}
           bind:value={offKey}
           placeholder="optional"
-          class="w-full rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
+          class="w-full rounded-xl px-4 py-3 pr-12 text-sm placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
         <button
           onclick={() => (showOff = !showOff)}

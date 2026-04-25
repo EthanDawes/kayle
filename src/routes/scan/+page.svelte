@@ -13,14 +13,13 @@
 
   let cameraState = $state<ScanState>("idle")
   let capturedImage = $state<string | null>(null)
-  let capturedMode = $state<ScanMode>("food")
+  let diningCourt = $state<string>("")
   let result = $state<NutritionInfo | null>(null)
   let error = $state("")
   let statusMessage = $state("Analyzing...")
 
   async function handleCapture(photo: string, mode: ScanMode) {
     capturedImage = photo
-    capturedMode = mode
     cameraState = "processing"
     statusMessage = mode === "barcode" ? "Detecting barcode..." : "Analyzing food..."
 
@@ -38,11 +37,9 @@
     await MealRepository.add({
       date: DayOverviewQuery.today(),
       timestamp: Date.now(),
-      mode: capturedMode,
       name: result.name,
       nutrients: result.nutrients,
       description: result.description,
-      brand: result.brand,
       imageDataUrl: capturedImage ?? undefined,
       source: result.source,
     })

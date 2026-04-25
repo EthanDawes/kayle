@@ -1,48 +1,8 @@
-import type { Nutrients } from "$lib/models/meal"
-
-export interface FoodAnalysis extends Nutrients {
-  description?: string
-}
-
-export async function analyzeFood(
+export async function analyzeImage(
   apiKey: string,
   imageDataUrl: string,
-  menuContext?: string,
-): Promise<FoodAnalysis> {
-  const prompt = [
-    "Analyze the food in this image. Return a JSON object with this shape:",
-    `
-// All units are in grams
-export interface Nutrients {
-  description: string (one short sentence)
-  calories: number
-  totalFat: number
-  saturatedFat: number
-  transFat: number
-  cholesterol: number
-  sodium: number
-  totalCarbohydrate: number
-  dietaryFiber: number
-  totalSugars: number
-  addedSugars: number
-  protein: number
-  vitaminD: number
-  vitaminC: number
-  calcium: number
-  iron: number
-  potassium: number
-}`,
-    "\nReturn only valid JSON, no markdown fences.",
-  ].join("\n")
-
-  const altPrompt = [
-    "Here are some foods and their serving sizes:",
-    menuContext,
-    "",
-    "Now, analyze the food in this image and respond with a JSON object mapping the food items you see with a multiple of its serving size.",
-    "Return only valid JSON, no markdown fences.",
-  ].join("\n")
-
+  prompt: string,
+): Promise<any> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -76,5 +36,7 @@ export interface Nutrients {
   const content: string | undefined = data.choices?.[0]?.message?.content
   if (!content) throw new Error("Empty response from OpenAI")
 
-  return JSON.parse(content) as FoodAnalysis
+  const parsed = JSON.parse(content)
+  console.log(parsed)
+  return parsed
 }

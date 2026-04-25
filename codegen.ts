@@ -9,6 +9,9 @@ const config: CodegenConfig = {
     },
   },
   ignoreNoDocuments: true,
+  config: {
+    useTypeImports: true,
+  },
 }
 
 export default config

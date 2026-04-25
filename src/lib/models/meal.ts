@@ -2,11 +2,9 @@ export interface Meal {
   id?: number
   date: string // YYYY-MM-DD
   timestamp: number
-  mode: "barcode" | "food"
   name: string
   nutrients: Nutrients
   description?: string
-  brand?: string
   imageDataUrl?: string
   source?: "openfoodfacts" | "openai"
 }
@@ -20,6 +18,7 @@ export interface NutritionInfo {
 
 // All units are in grams
 export interface Nutrients {
+  servingSize?: string
   calories?: number
   totalFat?: number
   saturatedFat?: number
