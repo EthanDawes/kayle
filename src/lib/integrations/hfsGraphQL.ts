@@ -12,6 +12,15 @@ export interface DiningCourtLocation {
   category: string
 }
 
+// Needed over toISOString because if late in the day, will think it's the next day
+export function localISODate(today: Date) {
+  return [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-")
+}
+
 function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
   meals: T[] | null | undefined,
   now: Date,
@@ -28,7 +37,7 @@ function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
 
 export async function getLocations() {
   const now = new Date()
-  const data = await sdk.diningCourts({ date: now.toISOString().split("T")[0] })
+  const data = await sdk.diningCourts({ date: localISODate(now) })
 
   return (data.diningCourts ?? [])
     .map((court) => {
@@ -42,15 +51,11 @@ export async function getLocations() {
     .filter((court) => court.dailyMenu.length > 0)
 }
 
-export async function getDiningCourts(): Promise<DiningCourtLocation[]> {
-  return (await getLocations()) as DiningCourtLocation[]
-}
-
 export async function getMenu(location: string) {
   const now = new Date()
 
   const data = await sdk.getMenu({
-    date: now.toISOString().split("T")[0],
+    date: localISODate(now),
     location,
   })
 
@@ -77,7 +82,7 @@ export async function getMenu(location: string) {
 
 export async function getAllFoods(): Promise<Record<string, string[]>> {
   const now = new Date()
-  const data = await sdk.allFoods({ date: now.toISOString().split("T")[0] })
+  const data = await sdk.allFoods({ date: localISODate(now) })
   return Object.fromEntries(
     data.diningCourts!.map((court) => [
       court?.name,
@@ -88,4 +93,4 @@ export async function getAllFoods(): Promise<Record<string, string[]>> {
   )
 }
 
-globalThis.getAllFoods = getAllFoods
+globalThis.getLocations = getLocations

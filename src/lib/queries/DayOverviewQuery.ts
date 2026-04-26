@@ -1,6 +1,7 @@
 import { MealRepository } from "$lib/repositories/MealRepository"
 import type { Meal, Nutrients } from "$lib/models/meal"
 import { DiningCourtService } from "$lib/services/DiningCourtService"
+import { localISODate } from "$lib/integrations/hfsGraphQL"
 
 export interface DayOverview {
   meals: Meal[]
@@ -22,6 +23,6 @@ export const DayOverviewQuery = {
   },
 
   today(): string {
-    return new Date().toISOString().split("T")[0]
+    return localISODate(new Date())
   },
 }

@@ -4,7 +4,7 @@
   import Camera from "$lib/UI/Camera.svelte"
   import LoadingOverlay from "$lib/UI/LoadingOverlay.svelte"
   import ResultCard from "$lib/UI/ResultCard.svelte"
-  import { getDiningCourts, type DiningCourtLocation } from "$lib/integrations/hfsGraphQL"
+  import { getLocations, type DiningCourtLocation } from "$lib/integrations/hfsGraphQL"
   import { processScan } from "$lib/workflows/processScan"
   import { MealRepository } from "$lib/repositories/MealRepository"
   import { DayOverviewQuery } from "$lib/queries/DayOverviewQuery"
@@ -35,7 +35,7 @@
     diningCourtsLoading = true
 
     try {
-      diningCourts = await getDiningCourts()
+      diningCourts = (await getLocations()) as DiningCourtLocation[]
 
       const courtsWithCoordinates = diningCourts.flatMap((court) =>
         court.latitude != null && court.longitude != null

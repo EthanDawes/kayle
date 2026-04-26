@@ -25,6 +25,10 @@ export async function analyzeImage(
         },
       ],
       response_format,
+      reasoning: {
+        effort: "medium",
+        summary: "auto",
+      },
       // max_tokens: 256,
     }),
   })
@@ -37,6 +41,7 @@ export async function analyzeImage(
   }
 
   const data = await res.json()
+  console.log(data)
   const content: string | undefined = data.choices?.[0]?.message?.content
   if (!content) throw new Error("Empty response from OpenAI")
 
