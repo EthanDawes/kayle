@@ -89,6 +89,7 @@
         description: result.description,
         imageDataUrl: capturedImage ?? undefined,
         source: result.source,
+        explaination: result.explaination,
       }),
     )
     goto(resolve("/"))

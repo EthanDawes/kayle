@@ -42,6 +42,10 @@
       <p class="mb-4 text-center text-xs text-zinc-600">
         via {result.source === "openai" ? "AI Vision" : "Open Food Facts"}
       </p>
+
+      {#if result.explaination}
+        <pre class="text-white">{result.explaination}</pre>
+      {/if}
     </div>
 
     <!-- Actions -->

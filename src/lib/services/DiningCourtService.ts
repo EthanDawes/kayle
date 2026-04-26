@@ -157,10 +157,10 @@ export const DiningCourtService = {
     )
   },
 
-  getServingSizesContext(menuNutrition: FoodNutrients): string {
-    return Object.entries(menuNutrition)
-      .map(([name, { servingSize }]) => name + ": " + servingSize!)
-      .join("\n")
+  getServingSizesContext(menuNutrition: FoodNutrients): Record<string, string> {
+    return Object.fromEntries(
+      Object.entries(menuNutrition).map(([name, { servingSize }]) => [name, servingSize!]),
+    )
   },
 
   multiplyNutrients(nutrients: Nutrients, scalar: number) {
