@@ -21,7 +21,6 @@ export async function askAI(apiKey: string, prompt: string): Promise<string> {
       ],
     })
 
-    console.log(response)
     const content = response.output_text
     if (!content) throw new Error("Empty response from OpenAI")
 
