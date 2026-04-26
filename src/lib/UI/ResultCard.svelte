@@ -43,10 +43,8 @@
         via {result.source === "openai" ? "AI Vision" : "Open Food Facts"}
       </p>
 
-      {#if result.diningCourt}
-        <p class="mb-4 text-center text-xs text-amber-500/70">
-          <span aria-hidden="true">⚠️</span> Nutrients are AI-estimated from the {result.diningCourt} menu. Please verify for accuracy.
-        </p>
+      {#if result.explaination}
+        <pre class="text-white">{result.explaination}</pre>
       {/if}
     </div>
 
