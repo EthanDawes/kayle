@@ -41,5 +41,5 @@ export async function processFoodPhoto(
     hour12: true,
   })
 
-  return { ...analysis, source: "openai", name: time + " " + diningCourt }
+  return { ...analysis, source: "openai", name: time + " " + diningCourt, diningCourt }
 }

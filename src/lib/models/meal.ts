@@ -14,6 +14,7 @@ export interface NutritionInfo {
   nutrients: Nutrients
   description?: string
   source: "openfoodfacts" | "openai"
+  diningCourt?: string
 }
 
 // All units are in grams
