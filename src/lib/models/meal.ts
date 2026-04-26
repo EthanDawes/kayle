@@ -7,6 +7,7 @@ export interface Meal {
   description?: string
   imageDataUrl?: string
   source?: "openfoodfacts" | "openai"
+  explaination?: string
 }
 
 export interface NutritionInfo {

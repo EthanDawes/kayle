@@ -36,6 +36,10 @@
 
   <NutritionLabel {...meal.nutrients} />
 
+  {#if meal.explaination}
+    <pre>{meal.explaination}</pre>
+  {/if}
+
   {#if meal.imageDataUrl}
     <img src={meal.imageDataUrl} alt={meal.name} class="h-48 w-full rounded-xl object-cover" />
   {:else}
