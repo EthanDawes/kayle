@@ -62,7 +62,9 @@ export const LLMService = {
   },
 
   async suggestMeals(apiKey: string) {
-    const menuContext = JSON.stringify(await getAllFoods())
+    const allFoods = await getAllFoods()
+    if (Object.keys(allFoods).length === 0) return "No dining courts are open right now"
+    const menuContext = JSON.stringify(allFoods)
 
     const prompt = [
       "Suggest 3 nutritious, balanced meals following the USDA myplate guidelines. All the items for one meal must come from the same location.",

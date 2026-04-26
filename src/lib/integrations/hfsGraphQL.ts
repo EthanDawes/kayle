@@ -84,12 +84,14 @@ export async function getAllFoods(): Promise<Record<string, string[]>> {
   const now = new Date()
   const data = await sdk.allFoods({ date: localISODate(now) })
   return Object.fromEntries(
-    data.diningCourts!.map((court) => [
-      court?.name,
-      getCurrentMeals(court!.dailyMenu!.meals, now).flatMap((meal) =>
-        meal.stations.flatMap((station) => station.items.map((item) => item.item.name)),
-      ),
-    ]),
+    data
+      .diningCourts!.map((court) => [
+        court?.name,
+        getCurrentMeals(court!.dailyMenu!.meals, now).flatMap((meal) =>
+          meal.stations.flatMap((station) => station.items.map((item) => item.item.name)),
+        ),
+      ])
+      .filter(([_, items]) => items && items.length > 0),
   )
 }
 
