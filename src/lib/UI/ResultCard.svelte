@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { NutritionInfo, Nutrients } from "$lib/models/meal"
+  import type { NutritionInfo } from "$lib/models/meal"
+  import { DiningCourtService } from "$lib/services/DiningCourtService"
   import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
 
   interface Props {
@@ -15,30 +16,10 @@
 
   const isBarcode = $derived(result.source === "openfoodfacts")
 
-  const scaledNutrients = $derived((): Nutrients => {
-    const n = result.nutrients
+  const scaledNutrients = $derived(() => {
     // Optimization: skip scaling when servings is 1 (multiplying by 1 is a no-op)
-    if (servings === 1) return n
-    return {
-      servingSize: n.servingSize,
-      servingsPerContainer: n.servingsPerContainer,
-      calories: (n.calories ?? 0) * servings,
-      totalFat: (n.totalFat ?? 0) * servings,
-      saturatedFat: (n.saturatedFat ?? 0) * servings,
-      transFat: (n.transFat ?? 0) * servings,
-      cholesterol: (n.cholesterol ?? 0) * servings,
-      sodium: (n.sodium ?? 0) * servings,
-      totalCarbohydrate: (n.totalCarbohydrate ?? 0) * servings,
-      dietaryFiber: (n.dietaryFiber ?? 0) * servings,
-      totalSugars: (n.totalSugars ?? 0) * servings,
-      addedSugars: (n.addedSugars ?? 0) * servings,
-      protein: (n.protein ?? 0) * servings,
-      vitaminD: (n.vitaminD ?? 0) * servings,
-      vitaminC: (n.vitaminC ?? 0) * servings,
-      calcium: (n.calcium ?? 0) * servings,
-      iron: (n.iron ?? 0) * servings,
-      potassium: (n.potassium ?? 0) * servings,
-    }
+    if (servings === 1) return result.nutrients
+    return DiningCourtService.multiplyNutrients({ ...result.nutrients }, servings)
   })
 
   function confirm() {
