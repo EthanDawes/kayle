@@ -23,14 +23,12 @@ export async function processFoodPhoto(
       .map(([name, size]) => name + ": " + size)
       .join("\n")
     console.log(servingContext)
-    const servingAnalysis =
-      imageDataUrl != null
-        ? await LLMService.analyzeDiningCourtMeal(settings.openaiKey, imageDataUrl, menuContext)
-        : await LLMService.analyzeDiningCourtMealText(
-            settings.openaiKey,
-            textDescription ?? "",
-            menuContext,
-          )
+    const servingAnalysis = await LLMService.analyzeDiningCourtMeal(
+      settings.openaiKey,
+      imageDataUrl,
+      menuContext,
+      textDescription,
+    )
     explaination = Object.entries(servingAnalysis.servings)
       .map(([key, value]) => `${value} x ${servingContext[key]} ${key}`)
       .join("\n")
@@ -42,10 +40,8 @@ export async function processFoodPhoto(
     }, {} as Nutrients)
     console.log(nutrients)
     analysis = { description: servingAnalysis.description, nutrients }
-  } else if (imageDataUrl != null) {
-    analysis = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl)
   } else {
-    analysis = await LLMService.analyzeFoodText(settings.openaiKey, textDescription ?? "")
+    analysis = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl, textDescription)
   }
 
   const time = new Date().toLocaleTimeString("en-US", {
