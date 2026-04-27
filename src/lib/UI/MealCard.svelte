@@ -36,13 +36,6 @@
 
   {#if meal.imageDataUrl}
     <img src={meal.imageDataUrl} alt={meal.name} class="h-48 w-full rounded-xl object-cover" />
-  {:else}
-    <div
-      class="flex h-32 w-full items-center justify-center rounded-xl bg-zinc-900 text-4xl"
-      aria-label={`${meal.name} placeholder image`}
-    >
-      {icon}
-    </div>
   {/if}
 
   <NutritionLabel {...meal.nutrients} />
