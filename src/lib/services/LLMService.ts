@@ -1,5 +1,5 @@
 import { getAllFoods } from "$lib/integrations/hfsGraphQL"
-import { analyzeImage, askAI } from "$lib/integrations/openai"
+import { analyzeImage, analyzeText, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 
 export interface FoodAnalysis {
@@ -12,11 +12,7 @@ export interface ServingAnalysis {
   description: string
 }
 
-export const LLMService = {
-  async analyzeFood(apiKey: string, imageDataUrl: string): Promise<FoodAnalysis> {
-    const prompt = [
-      "Analyze the food in this image. Return a JSON object with this shape:",
-      `
+const FOOD_JSON_SCHEMA = `
 {
   description: string (one short sentence)
   // All units are in grams
@@ -38,27 +34,49 @@ export const LLMService = {
     iron: number
     potassium: number
   }
-}`,
+}`
+
+export const LLMService = {
+  async analyzeFood(
+    apiKey: string,
+    imageDataUrl: string | undefined,
+    textDescription?: string,
+  ): Promise<FoodAnalysis> {
+    const intro = imageDataUrl
+      ? "Analyze the food in this image."
+      : `The user described what they ate as: "${textDescription}". Estimate the nutrition.`
+    const prompt = [
+      intro,
+      "Return a JSON object with this shape:",
+      FOOD_JSON_SCHEMA,
       "\nReturn only valid JSON, no markdown fences.",
     ].join("\n")
 
-    return analyzeImage(apiKey, imageDataUrl, prompt)
+    return imageDataUrl
+      ? analyzeImage(apiKey, imageDataUrl, prompt)
+      : analyzeText(apiKey, prompt)
   },
 
   async analyzeDiningCourtMeal(
     apiKey: string,
-    imageDataUrl: string,
+    imageDataUrl: string | undefined,
     menuContext: string,
+    textDescription?: string,
   ): Promise<ServingAnalysis> {
+    const foodSource = imageDataUrl
+      ? "the food in this image"
+      : `what the user described: "${textDescription}"`
     const prompt = [
       "Here are some foods and their serving sizes:",
       menuContext,
       "",
-      "Now, analyze the food in this image and respond with a JSON object: {servings: map of the food items you see with a multiple of its serving size, description: string (1 short sentence)}",
+      `Now, analyze ${foodSource} and respond with a JSON object: {servings: map of the food items with a multiple of its serving size, description: string (1 short sentence)}`,
       "Return only valid JSON, no markdown fences.",
     ].join("\n")
 
-    return await analyzeImage(apiKey, imageDataUrl, prompt)
+    return imageDataUrl
+      ? analyzeImage(apiKey, imageDataUrl, prompt)
+      : analyzeText(apiKey, prompt)
   },
 
   async suggestMeals(apiKey: string) {
