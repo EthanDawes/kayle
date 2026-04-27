@@ -1,15 +1,48 @@
 <script lang="ts">
-  import type { NutritionInfo } from "$lib/models/meal"
+  import type { NutritionInfo, Nutrients } from "$lib/models/meal"
   import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
 
   interface Props {
     result: NutritionInfo
     imageDataUrl?: string
-    onConfirm: () => void
+    onConfirm: (scaledResult: NutritionInfo) => void
     onDiscard: () => void
   }
 
   let { result, imageDataUrl, onConfirm, onDiscard }: Props = $props()
+
+  let servings = $state(1)
+
+  const isBarcode = $derived(result.source === "openfoodfacts")
+
+  const scaledNutrients = $derived((): Nutrients => {
+    const n = result.nutrients
+    if (servings === 1) return n
+    return {
+      servingSize: n.servingSize,
+      servingsPerContainer: n.servingsPerContainer,
+      calories: (n.calories ?? 0) * servings,
+      totalFat: (n.totalFat ?? 0) * servings,
+      saturatedFat: (n.saturatedFat ?? 0) * servings,
+      transFat: (n.transFat ?? 0) * servings,
+      cholesterol: (n.cholesterol ?? 0) * servings,
+      sodium: (n.sodium ?? 0) * servings,
+      totalCarbohydrate: (n.totalCarbohydrate ?? 0) * servings,
+      dietaryFiber: (n.dietaryFiber ?? 0) * servings,
+      totalSugars: (n.totalSugars ?? 0) * servings,
+      addedSugars: (n.addedSugars ?? 0) * servings,
+      protein: (n.protein ?? 0) * servings,
+      vitaminD: (n.vitaminD ?? 0) * servings,
+      vitaminC: (n.vitaminC ?? 0) * servings,
+      calcium: (n.calcium ?? 0) * servings,
+      iron: (n.iron ?? 0) * servings,
+      potassium: (n.potassium ?? 0) * servings,
+    }
+  })
+
+  function confirm() {
+    onConfirm({ ...result, nutrients: scaledNutrients() })
+  }
 </script>
 
 <div
@@ -37,7 +70,21 @@
         <p class="mb-4 text-xs leading-relaxed text-zinc-400">{result.description}</p>
       {/if}
 
-      <NutritionLabel {...result.nutrients} />
+      {#if isBarcode}
+        <div class="mb-4 flex items-center gap-3">
+          <label class="text-sm text-zinc-400" for="servings-input">Servings eaten</label>
+          <input
+            id="servings-input"
+            type="number"
+            min="0.25"
+            step="0.25"
+            bind:value={servings}
+            class="w-24 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white outline-none focus:border-zinc-500"
+          />
+        </div>
+      {/if}
+
+      <NutritionLabel {...scaledNutrients()} />
 
       <p class="mb-4 text-center text-xs text-zinc-600">
         via {result.source === "openai" ? "AI Vision" : "Open Food Facts"}
@@ -57,7 +104,7 @@
         Discard
       </button>
       <button
-        onclick={onConfirm}
+        onclick={confirm}
         class="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90"
       >
         Log Meal

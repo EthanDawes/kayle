@@ -79,18 +79,17 @@
     }
   }
 
-  async function handleConfirm() {
-    if (!result) return
+  async function handleConfirm(scaledResult: NutritionInfo) {
     await MealRepository.add(
       $state.snapshot({
         date: DayOverviewQuery.today(),
         timestamp: Date.now(),
-        name: result.name,
-        nutrients: result.nutrients,
-        description: result.description,
+        name: scaledResult.name,
+        nutrients: scaledResult.nutrients,
+        description: scaledResult.description,
         imageDataUrl: capturedImage ?? undefined,
-        source: result.source,
-        explaination: result.explaination,
+        source: scaledResult.source,
+        explaination: scaledResult.explaination,
       }),
     )
     goto(resolve("/"))

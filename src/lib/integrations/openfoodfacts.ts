@@ -4,6 +4,7 @@ export interface OFFProduct {
   product_name: string
   brands?: string
   serving_size?: string
+  servings_per_container?: number
   nutriments: {
     "energy-kcal_serving"?: number
     "energy-kcal_100g"?: number
@@ -82,6 +83,8 @@ export function mapOFFNutrients(product: OFFProduct): Nutrients {
   const n = product.nutriments
 
   return {
+    servingSize: product.serving_size,
+    servingsPerContainer: product.servings_per_container,
     calories: pick(n, "energy-kcal_serving", "energy-kcal_100g"),
     totalFat: pick(n, "fat_serving", "fat_100g"),
     saturatedFat: pick(n, "saturated-fat_serving", "saturated-fat_100g"),
