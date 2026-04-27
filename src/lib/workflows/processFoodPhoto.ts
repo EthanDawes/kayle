@@ -4,8 +4,9 @@ import { settings } from "$lib/stores/settings.svelte"
 import type { Nutrients, NutritionInfo } from "$lib/models/meal"
 
 export async function processFoodPhoto(
-  imageDataUrl: string,
+  imageDataUrl: string | undefined,
   diningCourt?: string,
+  textDescription?: string,
 ): Promise<NutritionInfo> {
   if (!settings.hasOpenai) {
     throw new Error("OpenAI API key not set. Go to Settings to add your key.")
@@ -22,11 +23,14 @@ export async function processFoodPhoto(
       .map(([name, size]) => name + ": " + size)
       .join("\n")
     console.log(servingContext)
-    const servingAnalysis = await LLMService.analyzeDiningCourtMeal(
-      settings.openaiKey,
-      imageDataUrl,
-      menuContext,
-    )
+    const servingAnalysis =
+      imageDataUrl != null
+        ? await LLMService.analyzeDiningCourtMeal(settings.openaiKey, imageDataUrl, menuContext)
+        : await LLMService.analyzeDiningCourtMealText(
+            settings.openaiKey,
+            textDescription ?? "",
+            menuContext,
+          )
     explaination = Object.entries(servingAnalysis.servings)
       .map(([key, value]) => `${value} x ${servingContext[key]} ${key}`)
       .join("\n")
@@ -38,8 +42,10 @@ export async function processFoodPhoto(
     }, {} as Nutrients)
     console.log(nutrients)
     analysis = { description: servingAnalysis.description, nutrients }
-  } else {
+  } else if (imageDataUrl != null) {
     analysis = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl)
+  } else {
+    analysis = await LLMService.analyzeFoodText(settings.openaiKey, textDescription ?? "")
   }
 
   const time = new Date().toLocaleTimeString("en-US", {

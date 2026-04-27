@@ -6,6 +6,7 @@
   import ResultCard from "$lib/UI/ResultCard.svelte"
   import { getLocations, type DiningCourtLocation } from "$lib/integrations/hfsGraphQL"
   import { processScan } from "$lib/workflows/processScan"
+  import { processFoodPhoto } from "$lib/workflows/processFoodPhoto"
   import { MealRepository } from "$lib/repositories/MealRepository"
   import { DayOverviewQuery } from "$lib/queries/DayOverviewQuery"
   import type { NutritionInfo } from "$lib/models/meal"
@@ -101,6 +102,23 @@
     error = ""
     cameraState = "idle"
   }
+
+  async function handleTextLog() {
+    const description = prompt("What did you eat?")
+    if (!description) return
+
+    cameraState = "processing"
+    capturedImage = null
+    statusMessage = "Analyzing food..."
+
+    try {
+      result = await processFoodPhoto(undefined, diningCourt || undefined, description)
+      cameraState = "result"
+    } catch (err) {
+      error = err instanceof Error ? err.message : "Analysis failed. Please try again."
+      cameraState = "error"
+    }
+  }
 </script>
 
 <svelte:head>
@@ -130,6 +148,14 @@
         class="shrink-0 rounded-full border border-white/10 px-4 py-2.5 text-sm text-white transition-colors hover:border-white/25 hover:bg-white/10 disabled:cursor-not-allowed disabled:text-white/35"
       >
         Unset
+      </button>
+
+      <button
+        onclick={handleTextLog}
+        aria-label="Log meal by text"
+        class="shrink-0 rounded-full border border-white/10 px-4 py-2.5 text-sm text-white transition-colors hover:border-white/25 hover:bg-white/10"
+      >
+        ✏️
       </button>
     </div>
   </div>

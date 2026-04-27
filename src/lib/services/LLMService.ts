@@ -1,5 +1,5 @@
 import { getAllFoods } from "$lib/integrations/hfsGraphQL"
-import { analyzeImage, askAI } from "$lib/integrations/openai"
+import { analyzeImage, analyzeText, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 
 export interface FoodAnalysis {
@@ -59,6 +59,56 @@ export const LLMService = {
     ].join("\n")
 
     return await analyzeImage(apiKey, imageDataUrl, prompt)
+  },
+
+  async analyzeFoodText(apiKey: string, description: string): Promise<FoodAnalysis> {
+    const prompt = [
+      `The user described what they ate as: "${description}"`,
+      "Estimate the nutrition for this meal. Return a JSON object with this shape:",
+      `
+{
+  description: string (one short sentence)
+  // All units are in grams
+  nutrients: {
+    calories: number
+    totalFat: number
+    saturatedFat: number
+    transFat: number
+    cholesterol: number
+    sodium: number
+    totalCarbohydrate: number
+    dietaryFiber: number
+    totalSugars: number
+    addedSugars: number
+    protein: number
+    vitaminD: number
+    vitaminC: number
+    calcium: number
+    iron: number
+    potassium: number
+  }
+}`,
+      "\nReturn only valid JSON, no markdown fences.",
+    ].join("\n")
+
+    return analyzeText(apiKey, prompt)
+  },
+
+  async analyzeDiningCourtMealText(
+    apiKey: string,
+    description: string,
+    menuContext: string,
+  ): Promise<ServingAnalysis> {
+    const prompt = [
+      "Here are some foods and their serving sizes:",
+      menuContext,
+      "",
+      `The user described what they ate as: "${description}"`,
+      "Respond with a JSON object: {servings: map of the food items mentioned with a multiple of its serving size, description: string (1 short sentence)}",
+      "Return only valid JSON, no markdown fences.",
+    ].join("\n")
+
+    return await analyzeText(apiKey, prompt)
   },
 
   async suggestMeals(apiKey: string) {
