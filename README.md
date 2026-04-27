@@ -1,42 +1,45 @@
-# sv
+# Kayle
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+**Wholistic AI meal tracking** — deployed at [ethandawes.github.io/kayle](https://ethandawes.github.io/kayle/)
 
-## Creating a project
+Most nutrition apps only track macros (protein, carbs, calories). Kayle tracks *everything* and presents it as a familiar nutrition label, so you always know exactly what you're eating without having to learn a new format.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-pnpm dlx sv@0.14.0 create --template minimal --types ts --add prettier tailwindcss="plugins:none" sveltekit-adapter="adapter:static" mcp="ide:claude-code+setup:local" --install pnpm kayle
-```
+- **Purdue Dining menus** — browse and log meals directly from Purdue's dining halls via the Purdue HFS GraphQL API
+- **LLM vision** — photograph any meal and let an AI identify it and estimate its full nutritional content
+- **Barcode scanning** — scan packaged food barcodes to pull nutrition data instantly
+- **Full nutrition labels** — output matches the FDA nutrition-facts format that people already know how to read, covering far more than just macros
+- **Progressive Web App** — installable on mobile for quick logging on the go
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Install dependencies and start the dev server:
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm install
+pnpm dev
 ```
 
-## Building
+Open [http://localhost:5173](http://localhost:5173) in your browser. The app hot-reloads as you edit files.
 
-To create a production version of your app:
+### Useful scripts
 
-```sh
-npm run build
-```
+| Script | Description |
+|---|---|
+| `pnpm dev` | Start local dev server |
+| `pnpm build` | Production build (output in `build/`) |
+| `pnpm preview` | Preview the production build locally |
+| `pnpm check` | Run Svelte + TypeScript type checking |
+| `pnpm format` | Format code with Prettier |
+| `pnpm codegen` | Regenerate GraphQL types from the Purdue HFS schema |
+| `pnpm dev:server` | Run the Cloudflare Workers backend locally with Wrangler |
 
-You can preview the production build with `npm run preview`.
+### Stack
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- [SvelteKit](https://kit.svelte.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS v4](https://tailwindcss.com/)
+- [Cloudflare Workers](https://workers.cloudflare.com/) (backend / AI proxy)
+- [OpenAI](https://platform.openai.com/) (vision)
+- [Dexie](https://dexie.org/) (IndexedDB wrapper for local storage)
+- [Chart.js](https://www.chartjs.org/) (nutrition trend charts)
