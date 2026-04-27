@@ -17,6 +17,7 @@
 
   const scaledNutrients = $derived((): Nutrients => {
     const n = result.nutrients
+    // Optimization: skip scaling when servings is 1 (multiplying by 1 is a no-op)
     if (servings === 1) return n
     return {
       servingSize: n.servingSize,
@@ -76,7 +77,7 @@
           <input
             id="servings-input"
             type="number"
-            min="0.25"
+            min="0.1"
             step="0.25"
             bind:value={servings}
             class="w-24 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white outline-none focus:border-zinc-500"
