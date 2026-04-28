@@ -14,6 +14,7 @@ export interface NutritionInfo {
   name: string
   nutrients: Nutrients
   description?: string
+  imageDataUrl?: string
   source: "openfoodfacts" | "openai"
   explaination?: string
 }
