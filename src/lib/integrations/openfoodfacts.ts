@@ -5,6 +5,8 @@ export interface OFFProduct {
   brands?: string
   serving_size?: string
   servings_per_container?: number
+  image_front_url?: string
+  image_url?: string
   nutriments: {
     "energy-kcal_serving"?: number
     "energy-kcal_100g"?: number

@@ -13,6 +13,7 @@ export async function processBarcode(imageDataUrl: string): Promise<NutritionInf
   return {
     name: product.product_name || "Unknown Product",
     nutrients: mapOFFNutrients(product),
+    imageDataUrl: product.image_front_url || product.image_url,
     source: "openfoodfacts",
   }
 }

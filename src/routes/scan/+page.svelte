@@ -87,7 +87,7 @@
         name: scaledResult.name,
         nutrients: scaledResult.nutrients,
         description: scaledResult.description,
-        imageDataUrl: capturedImage ?? undefined,
+        imageDataUrl: scaledResult.imageDataUrl ?? capturedImage ?? undefined,
         source: scaledResult.source,
         explaination: scaledResult.explaination,
       }),
@@ -168,7 +168,7 @@
   {#if cameraState === "result" && result}
     <ResultCard
       {result}
-      imageDataUrl={capturedImage ?? undefined}
+      imageDataUrl={result.imageDataUrl ?? capturedImage ?? undefined}
       onConfirm={handleConfirm}
       onDiscard={reset}
     />
