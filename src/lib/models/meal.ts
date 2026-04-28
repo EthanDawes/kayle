@@ -21,6 +21,7 @@ export interface NutritionInfo {
 // All units are in grams
 export interface Nutrients {
   servingSize?: string
+  servingsPerContainer?: number
   calories?: number
   totalFat?: number
   saturatedFat?: number

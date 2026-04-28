@@ -4,7 +4,7 @@ import type { Nutrients } from "$lib/models/meal"
 import type { Coordinates } from "./LocationService"
 
 export type FoodNutrients = Record<string, Nutrients>
-export type NumericNutrientKey = Exclude<keyof Nutrients, "servingSize">
+export type NumericNutrientKey = Exclude<keyof Nutrients, "servingSize" | "servingsPerContainer">
 export const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
   "calories",
   "totalFat",

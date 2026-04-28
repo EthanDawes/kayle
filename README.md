@@ -2,7 +2,7 @@
 
 **Wholistic AI meal tracking** — deployed at [ethandawes.github.io/kayle](https://ethandawes.github.io/kayle/)
 
-Most nutrition apps only track macros (protein, carbs, calories). Kayle tracks *everything* and presents it as a familiar nutrition label, so you always know exactly what you're eating without having to learn a new format.
+Most nutrition apps only track macros (protein, carbs, calories). Kayle tracks _everything_ and presents it as a familiar nutrition label, so you always know exactly what you're eating without having to learn a new format.
 
 ## Features
 
@@ -25,14 +25,14 @@ Open [http://localhost:5173](http://localhost:5173) in your browser. The app hot
 
 ### Useful scripts
 
-| Script | Description |
-|---|---|
-| `pnpm dev` | Start local dev server |
-| `pnpm build` | Production build (output in `build/`) |
-| `pnpm preview` | Preview the production build locally |
-| `pnpm check` | Run Svelte + TypeScript type checking |
-| `pnpm format` | Format code with Prettier |
-| `pnpm codegen` | Regenerate GraphQL types from the Purdue HFS schema |
+| Script            | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| `pnpm dev`        | Start local dev server                                   |
+| `pnpm build`      | Production build (output in `build/`)                    |
+| `pnpm preview`    | Preview the production build locally                     |
+| `pnpm check`      | Run Svelte + TypeScript type checking                    |
+| `pnpm format`     | Format code with Prettier                                |
+| `pnpm codegen`    | Regenerate GraphQL types from the Purdue HFS schema      |
 | `pnpm dev:server` | Run the Cloudflare Workers backend locally with Wrangler |
 
 ### Stack

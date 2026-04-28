@@ -12,7 +12,7 @@
   const icon = $derived(meal.source === "openfoodfacts" ? "📦" : "🍽")
 </script>
 
-<div class="space-y-4 rounded-2xl p-4 overflow-hidden" style="font-family: 'DM Mono', monospace;">
+<div class="space-y-4 overflow-hidden rounded-2xl p-4" style="font-family: 'DM Mono', monospace;">
   <div class="flex items-start justify-between gap-3">
     <div class="min-w-0 flex-1 space-y-1">
       <p class="text-sm font-semibold">{meal.name}</p>

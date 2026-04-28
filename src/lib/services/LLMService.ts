@@ -52,9 +52,7 @@ export const LLMService = {
       "\nReturn only valid JSON, no markdown fences.",
     ].join("\n")
 
-    return imageDataUrl
-      ? analyzeImage(apiKey, imageDataUrl, prompt)
-      : analyzeText(apiKey, prompt)
+    return imageDataUrl ? analyzeImage(apiKey, imageDataUrl, prompt) : analyzeText(apiKey, prompt)
   },
 
   async analyzeDiningCourtMeal(
@@ -74,9 +72,7 @@ export const LLMService = {
       "Return only valid JSON, no markdown fences.",
     ].join("\n")
 
-    return imageDataUrl
-      ? analyzeImage(apiKey, imageDataUrl, prompt)
-      : analyzeText(apiKey, prompt)
+    return imageDataUrl ? analyzeImage(apiKey, imageDataUrl, prompt) : analyzeText(apiKey, prompt)
   },
 
   async suggestMeals(apiKey: string) {

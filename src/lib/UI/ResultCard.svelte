@@ -1,15 +1,30 @@
 <script lang="ts">
   import type { NutritionInfo } from "$lib/models/meal"
+  import { DiningCourtService } from "$lib/services/DiningCourtService"
   import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
 
   interface Props {
     result: NutritionInfo
     imageDataUrl?: string
-    onConfirm: () => void
+    onConfirm: (scaledResult: NutritionInfo) => void
     onDiscard: () => void
   }
 
   let { result, imageDataUrl, onConfirm, onDiscard }: Props = $props()
+
+  let servings = $state(1)
+
+  const isBarcode = $derived(result.source === "openfoodfacts")
+
+  const scaledNutrients = $derived(() => {
+    // Optimization: skip scaling when servings is 1 (multiplying by 1 is a no-op)
+    if (servings === 1) return result.nutrients
+    return DiningCourtService.multiplyNutrients({ ...result.nutrients }, servings)
+  })
+
+  function confirm() {
+    onConfirm({ ...result, nutrients: scaledNutrients() })
+  }
 </script>
 
 <div
@@ -37,7 +52,21 @@
         <p class="mb-4 text-xs leading-relaxed text-zinc-400">{result.description}</p>
       {/if}
 
-      <NutritionLabel {...result.nutrients} />
+      {#if isBarcode}
+        <div class="mb-4 flex items-center gap-3">
+          <label class="text-sm text-zinc-400" for="servings-input">Servings eaten</label>
+          <input
+            id="servings-input"
+            type="number"
+            min="0.1"
+            step="0.25"
+            bind:value={servings}
+            class="w-24 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-white outline-none focus:border-zinc-500"
+          />
+        </div>
+      {/if}
+
+      <NutritionLabel {...scaledNutrients()} />
 
       <p class="mb-4 text-center text-xs text-zinc-600">
         via {result.source === "openai" ? "AI Vision" : "Open Food Facts"}
@@ -57,7 +86,7 @@
         Discard
       </button>
       <button
-        onclick={onConfirm}
+        onclick={confirm}
         class="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90"
       >
         Log Meal
