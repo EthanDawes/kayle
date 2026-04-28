@@ -57,7 +57,7 @@ export interface OFFProduct {
 }
 
 export async function fetchProduct(barcode: string, apiKey?: string): Promise<OFFProduct | null> {
-  const url = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
+  const url = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,serving_size,servings_per_container`
   const headers: Record<string, string> = {
     "User-Agent": "Kayle-NutritionApp/1.0 (ethan.d.python@gmail.com)",
   }
