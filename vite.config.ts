@@ -14,6 +14,7 @@ export default defineConfig({
       manifest: {
         name: "Kayle",
         description: "Wholistic AI nutrition tracking",
+        theme_color: "#ffffff",
         icons: [
           {
             src: "pwa-64x64.png",
