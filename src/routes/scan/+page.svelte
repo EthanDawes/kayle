@@ -41,7 +41,7 @@
 
       const courtsWithCoordinates = diningCourts.flatMap((court) =>
         court.latitude != null && court.longitude != null
-          ? [{ name: court.name, latitude: court.latitude, longitude: court.longitude }]
+          ? [{ name: court.name, latitude: court.latitude, longitude: court.longitude, category: court.category }]
           : [],
       )
 
