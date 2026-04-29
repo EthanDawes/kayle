@@ -83,10 +83,12 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm"
     onclick={() => (activeComponent = null)}
   >
-    <div onclick={(e) => e.stopPropagation()} class="max-h-[85vh] overflow-y-auto">
+    <div class="max-h-[85vh] overflow-y-auto">
       <p class="mb-3 text-center text-sm font-semibold text-white">
         {activeComponent.name}
-        <span class="text-zinc-400">({activeComponent.servings}× {activeComponent.servingSize})</span>
+        <span class="text-zinc-400"
+          >({activeComponent.servings}× {activeComponent.servingSize})</span
+        >
       </p>
       <NutritionLabel {...scaledNutrients(activeComponent)} />
     </div>

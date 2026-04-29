@@ -6,9 +6,11 @@
 
   interface NutritionProps extends Nutrients {
     servingSize?: string
+    class?: string
   }
 
   let {
+    class: className = "",
     servingSize = "",
     calories = 0,
     totalFat = 0,
@@ -158,7 +160,7 @@
   ])
 </script>
 
-<div class="nutrition-label">
+<div class="nutrition-label {className}">
   <!-- Header -->
   <div class="header">
     <div class="title">Nutrition Facts</div>

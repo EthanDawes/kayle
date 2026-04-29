@@ -133,7 +133,7 @@
     </div>
 
     {#if overview.meals.length > 0}
-      <NutritionLabel {...overview.nutrients} />
+      <NutritionLabel {...overview.nutrients} class="mx-auto" />
     {:else}
       <div class="flex flex-col items-center gap-2 py-16 text-center">
         <span class="text-5xl">&#127869;</span>
