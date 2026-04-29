@@ -119,37 +119,31 @@
       <Spinner />
     </div>
   {:else if overview}
-    <div class="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth">
-      <div class="h-full w-full shrink-0 snap-start">
-        <!-- Day summary page -->
-        {#if DayOverviewQuery.today() == selectedDate}
-          <button class="mb-2 cursor-pointer border" onclick={loadSuggestedMeals}>
-            Suggest meals
-            {#if loadingSuggestions}
-              <Spinner style="width: 10px; height: 10px" />
-            {/if}
-          </button>
+    <!-- Day summary page -->
+    {#if DayOverviewQuery.today() == selectedDate}
+      <button class="mb-2 cursor-pointer border" onclick={loadSuggestedMeals}>
+        Suggest meals
+        {#if loadingSuggestions}
+          <Spinner style="width: 10px; height: 10px" />
         {/if}
-        <div class="md">
-          <Markdown source={suggestedMeal} />
-        </div>
-
-        {#if overview.meals.length > 0}
-          <NutritionLabel {...overview.nutrients} />
-        {:else}
-          <div class="flex flex-col items-center gap-2 py-16 text-center">
-            <span class="text-5xl">&#127869;</span>
-            <p class="text-sm text-zinc-500">Nothing logged yet.</p>
-            <p class="text-xs text-zinc-600">Tap Scan to get started.</p>
-          </div>
-        {/if}
-      </div>
-      {#each overview.meals.toReversed() as meal (meal.id)}
-        <div class="h-full w-full shrink-0 snap-start">
-          <MealCard {meal} onDelete={deleteMeal} />
-        </div>
-      {/each}
+      </button>
+    {/if}
+    <div class="md">
+      <Markdown source={suggestedMeal} />
     </div>
+
+    {#if overview.meals.length > 0}
+      <NutritionLabel {...overview.nutrients} />
+    {:else}
+      <div class="flex flex-col items-center gap-2 py-16 text-center">
+        <span class="text-5xl">&#127869;</span>
+        <p class="text-sm text-zinc-500">Nothing logged yet.</p>
+        <p class="text-xs text-zinc-600">Tap Scan to get started.</p>
+      </div>
+    {/if}
+    {#each overview.meals.toReversed() as meal (meal.id)}
+      <MealCard {meal} onDelete={deleteMeal} />
+    {/each}
   {/if}
 </div>
 

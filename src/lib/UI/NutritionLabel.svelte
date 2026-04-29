@@ -6,12 +6,10 @@
 
   interface NutritionProps extends Nutrients {
     servingSize?: string
-    servingsPerContainer?: number
   }
 
   let {
     servingSize = "",
-    servingsPerContainer = 0,
     calories = 0,
     totalFat = 0,
     saturatedFat = 0,
@@ -165,7 +163,6 @@
   <div class="header">
     <div class="title">Nutrition Facts</div>
     <div class="serving-info">
-      <span>{whole(servingsPerContainer)} servings per container</span>
       <div class="serving-size-row">
         <span class="serving-size-label">Serving size</span>
         <span class="serving-size-val">{servingSize}</span>
