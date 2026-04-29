@@ -2,38 +2,30 @@ import { getAllFoods } from "$lib/integrations/hfsGraphQL"
 import { analyzeImage, analyzeText, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 
-export interface FoodAnalysis {
-  nutrients: Nutrients
-  description: string
-}
+export type FoodAnalysis = Nutrients
 
 export interface ServingAnalysis {
   servings: Record<string, number>
-  description: string
 }
 
-const FOOD_JSON_SCHEMA = `
-{
-  description: string (one short sentence)
+const FOOD_JSON_SCHEMA = `{
   // All units are in grams
-  nutrients: {
-    calories: number
-    totalFat: number
-    saturatedFat: number
-    transFat: number
-    cholesterol: number
-    sodium: number
-    totalCarbohydrate: number
-    dietaryFiber: number
-    totalSugars: number
-    addedSugars: number
-    protein: number
-    vitaminD: number
-    vitaminC: number
-    calcium: number
-    iron: number
-    potassium: number
-  }
+  calories: number
+  totalFat: number
+  saturatedFat: number
+  transFat: number
+  cholesterol: number
+  sodium: number
+  totalCarbohydrate: number
+  dietaryFiber: number
+  totalSugars: number
+  addedSugars: number
+  protein: number
+  vitaminD: number
+  vitaminC: number
+  calcium: number
+  iron: number
+  potassium: number
 }`
 
 export const LLMService = {
@@ -68,7 +60,7 @@ export const LLMService = {
       "Here are some foods and their serving sizes:",
       menuContext,
       "",
-      `Now, analyze ${foodSource} and respond with a JSON object: {servings: map of the food items with a multiple of its serving size, description: string (1 short sentence)}`,
+      `Now, analyze ${foodSource} and respond with a JSON object: {servings: map of the food items with a multiple of its serving size}`,
       "Return only valid JSON, no markdown fences.",
     ].join("\n")
 

@@ -86,10 +86,9 @@
         timestamp: Date.now(),
         name: scaledResult.name,
         nutrients: scaledResult.nutrients,
-        description: scaledResult.description,
         imageDataUrl: scaledResult.imageDataUrl ?? capturedImage ?? undefined,
         source: scaledResult.source,
-        explaination: scaledResult.explaination,
+        components: scaledResult.components,
       }),
     )
     goto(resolve("/"))

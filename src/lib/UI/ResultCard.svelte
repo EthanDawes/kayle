@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NutritionInfo } from "$lib/models/meal"
+  import type { NutritionInfo, Nutrients } from "$lib/models/meal"
   import { DiningCourtService } from "$lib/services/DiningCourtService"
   import NutritionLabel from "$lib/UI/NutritionLabel.svelte"
 
@@ -13,17 +13,36 @@
   let { result, imageDataUrl, onConfirm, onDiscard }: Props = $props()
 
   let servings = $state(1)
+  let servingsOverride = $state<Record<string, number>>({})
 
   const isBarcode = $derived(result.source === "openfoodfacts")
 
-  const scaledNutrients = $derived(() => {
-    // Optimization: skip scaling when servings is 1 (multiplying by 1 is a no-op)
+  const editableComponents = $derived.by(() =>
+    (result.components ?? []).map((c) => ({
+      ...c,
+      servings: servingsOverride[c.name] ?? c.servings,
+    })),
+  )
+
+  const scaledNutrients = $derived.by(() => {
+    if (editableComponents.length > 0) {
+      return editableComponents.reduce((acc, comp) => {
+        return DiningCourtService.addNutrients(
+          acc,
+          DiningCourtService.multiplyNutrients({ ...comp.baseNutrients }, comp.servings),
+        )
+      }, {} as Nutrients)
+    }
     if (servings === 1) return result.nutrients
     return DiningCourtService.multiplyNutrients({ ...result.nutrients }, servings)
   })
 
   function confirm() {
-    onConfirm({ ...result, nutrients: scaledNutrients() })
+    onConfirm({
+      ...result,
+      nutrients: scaledNutrients,
+      components: editableComponents.length > 0 ? editableComponents.map((c) => ({ ...c })) : undefined,
+    })
   }
 </script>
 
@@ -41,18 +60,32 @@
         />
       {/if}
 
-      <!-- Name + calories -->
       <div class="mb-3 flex items-start justify-between gap-4">
         <div class="min-w-0 flex-1">
           <h2 class="text-lg font-bold text-white">{result.name}</h2>
         </div>
       </div>
 
-      {#if result.description}
-        <p class="mb-4 text-xs leading-relaxed text-zinc-400">{result.description}</p>
-      {/if}
-
-      {#if isBarcode}
+      {#if editableComponents.length > 0}
+        <div class="mb-4 space-y-2">
+          {#each editableComponents as comp (comp.name)}
+            <div class="flex items-center gap-2">
+              <span class="min-w-0 flex-1 truncate text-sm text-zinc-300">{comp.name}</span>
+              <span class="shrink-0 text-xs text-zinc-500">{comp.servingSize}</span>
+              <input
+                type="number"
+                min="0"
+                step="0.25"
+                value={comp.servings}
+                oninput={(e) => {
+                  servingsOverride[comp.name] = Number(e.currentTarget.value)
+                }}
+                class="w-20 shrink-0 rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-1 text-sm text-white outline-none focus:border-zinc-500"
+              />
+            </div>
+          {/each}
+        </div>
+      {:else if isBarcode}
         <div class="mb-4 flex items-center gap-3">
           <label class="text-sm text-zinc-400" for="servings-input">Servings eaten</label>
           <input
@@ -66,18 +99,13 @@
         </div>
       {/if}
 
-      <NutritionLabel {...scaledNutrients()} />
+      <NutritionLabel {...scaledNutrients} />
 
       <p class="mb-4 text-center text-xs text-zinc-600">
         via {result.source === "openai" ? "AI Vision" : "Open Food Facts"}
       </p>
-
-      {#if result.explaination}
-        <pre class="text-white">{result.explaination}</pre>
-      {/if}
     </div>
 
-    <!-- Actions -->
     <div class="flex gap-3">
       <button
         onclick={onDiscard}

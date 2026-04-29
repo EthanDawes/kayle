@@ -1,22 +1,27 @@
+export interface MealComponent {
+  name: string
+  servings: number
+  servingSize: string
+  baseNutrients: Nutrients
+}
+
 export interface Meal {
   id?: number
   date: string // YYYY-MM-DD
   timestamp: number
   name: string
   nutrients: Nutrients
-  description?: string
   imageDataUrl?: string
   source?: "openfoodfacts" | "openai"
-  explaination?: string
+  components?: MealComponent[]
 }
 
 export interface NutritionInfo {
   name: string
   nutrients: Nutrients
-  description?: string
   imageDataUrl?: string
   source: "openfoodfacts" | "openai"
-  explaination?: string
+  components?: MealComponent[]
 }
 
 // All units are in grams

@@ -1,7 +1,7 @@
 import { DiningCourtService } from "$lib/services/DiningCourtService"
-import { LLMService, type FoodAnalysis } from "$lib/services/LLMService"
+import { LLMService } from "$lib/services/LLMService"
 import { settings } from "$lib/stores/settings.svelte"
-import type { Nutrients, NutritionInfo } from "$lib/models/meal"
+import type { MealComponent, Nutrients, NutritionInfo } from "$lib/models/meal"
 
 export async function processFoodPhoto(
   imageDataUrl: string | undefined,
@@ -12,8 +12,8 @@ export async function processFoodPhoto(
     throw new Error("OpenAI API key not set. Go to Settings to add your key.")
   }
 
-  let analysis: FoodAnalysis
-  let explaination: string | undefined
+  let nutrients: Nutrients
+  let components: MealComponent[] | undefined
 
   if (diningCourt) {
     const menuNutrition = await DiningCourtService.getMenuNutrition(diningCourt)
@@ -29,19 +29,23 @@ export async function processFoodPhoto(
       menuContext,
       textDescription,
     )
-    explaination = Object.entries(servingAnalysis.servings)
-      .map(([key, value]) => `${value} x ${servingContext[key]} ${key}`)
-      .join("\n")
-    const nutrients = Object.entries(servingAnalysis.servings).reduce((acc, [key, value]) => {
+
+    components = Object.entries(servingAnalysis.servings).map(([name, servings]) => ({
+      name,
+      servings,
+      servingSize: servingContext[name] ?? "",
+      baseNutrients: { ...menuNutrition[name] },
+    }))
+
+    nutrients = components.reduce((acc, comp) => {
       return DiningCourtService.addNutrients(
         acc,
-        DiningCourtService.multiplyNutrients(menuNutrition[key], value),
+        DiningCourtService.multiplyNutrients({ ...comp.baseNutrients }, comp.servings),
       )
     }, {} as Nutrients)
     console.log(nutrients)
-    analysis = { description: servingAnalysis.description, nutrients }
   } else {
-    analysis = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl, textDescription)
+    nutrients = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl, textDescription)
   }
 
   const time = new Date().toLocaleTimeString("en-US", {
@@ -50,5 +54,5 @@ export async function processFoodPhoto(
     hour12: true,
   })
 
-  return { ...analysis, source: "openai", name: time + " " + diningCourt, explaination }
+  return { nutrients, source: "openai", name: time + (diningCourt ? " " + diningCourt : ""), components }
 }
