@@ -47,6 +47,7 @@ interface DiningLocation {
   latitude: number
   longitude: number
   name: string
+  category?: string
 }
 
 export const MAX_AUTO_SELECT_DISTANCE_METERS = 250
@@ -185,7 +186,15 @@ export const DiningCourtService = {
   ): Promise<string> {
     if (!locations.length) return ""
 
-    const nearest = locations.reduce((a, b) => (distance(coords, a) < distance(coords, b) ? a : b))
+    const nearest = locations.reduce((a, b) => {
+      const da = distance(coords, a)
+      const db = distance(coords, b)
+      if (da !== db) return da < db ? a : b
+      // Break ties by preferring "Dining Courts" category
+      if (a.category === "Dining Courts") return a
+      if (b.category === "Dining Courts") return b
+      return a
+    })
 
     return distance(coords, nearest) <= maxDistanceMeters ? nearest.name! : ""
   },
