@@ -54,5 +54,5 @@ export async function processFoodPhoto(
     hour12: true,
   })
 
-  return { nutrients, source: "openai", name: diningCourt ?? "Meal", components }
+  return { nutrients, source: "openai", name: diningCourt ?? textDescription ?? "Meal", components }
 }
