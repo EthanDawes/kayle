@@ -36,7 +36,16 @@
       </div>
     {/if}
 
-    <div class="min-w-0 flex-1">
+    <button
+      class="min-w-0 flex-1 text-left"
+      onclick={() =>
+        (activeComponent = {
+          ...meal,
+          baseNutrients: meal.nutrients,
+          servingSize: "",
+          servings: 1,
+        })}
+    >
       <p class="truncate text-sm font-semibold">{meal.name}</p>
       <p class="text-xs text-zinc-500">
         {time}{meal.nutrients.servingSize ? ` · ${meal.nutrients.servingSize}` : ""}
@@ -46,7 +55,7 @@
           {Math.round(meal.nutrients.calories)} kcal
         </p>
       {/if}
-    </div>
+    </button>
 
     {#if onDelete && meal.id != null}
       <button
