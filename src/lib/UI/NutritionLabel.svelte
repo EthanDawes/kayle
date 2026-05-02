@@ -35,10 +35,18 @@
     potassium = 0,
   }: NutritionProps = $props()
 
-  function pct(key: NutrientKey, consumed: number): number {
+  function pctRaw(key: NutrientKey, consumed: number): number {
     const dv = DAILY_VALUES[key]
     if (!dv || dv === 0) return 0
-    return Math.min(100, Math.round((consumed / dv) * 100))
+    return (consumed / dv) * 100
+  }
+
+  function pctBase(p: number): number {
+    return Math.min(100, p)
+  }
+
+  function pctExcess(p: number): number {
+    return p > 100 ? p - 100 : 0
   }
 
   function whole(value: number): number {
@@ -184,8 +192,10 @@
 
   <!-- Main nutrients -->
   {#each mainRows as row}
-    {@const p = pct(row.key, row.consumed)}
-    {@const color = barColor(p)}
+    {@const pRaw = pctRaw(row.key, row.consumed)}
+    {@const base = pctBase(pRaw)}
+    {@const excess = pctExcess(pRaw)}
+    {@const color = barColor(base)}
     <button
       type="button"
       class="nutrient-row nutrient-button"
@@ -193,10 +203,15 @@
       class:indent={row.indent}
       class:sub={row.sub}
       class:thick-border={row.border === "thick"}
-      style="--bar-pct: {p}%; --bar-color: {color};"
       onclick={() => onNutrientClick?.(row.key, row.label)}
     >
-      <div class="bar-bg"></div>
+      <div class="bar-bg-wrapper">
+        <div class="bar-base" style="width: {base}%; --bar-color: {color};"></div>
+
+        {#if excess > 0}
+          <div class="bar-excess" style="width: {excess}%;"></div>
+        {/if}
+      </div>
       <div class="row-content">
         <span class="nutrient-name" class:bold={row.bold}>
           {row.label}
@@ -216,17 +231,24 @@
 
   <!-- Micronutrients -->
   {#each microRows as row}
-    {@const p = pct(row.key, row.consumed)}
-    {@const color = barColor(p)}
+    {@const pRaw = pctRaw(row.key, row.consumed)}
+    {@const base = pctBase(pRaw)}
+    {@const excess = pctExcess(pRaw)}
+    {@const color = barColor(base)}
     <button
       type="button"
       class="nutrient-row micro nutrient-button"
       class:clickable={!!onNutrientClick}
-      style="--bar-pct: {p}%; --bar-color: {color};"
       class:no-border={row.border === "none"}
       onclick={() => onNutrientClick?.(row.key, row.label)}
     >
-      <div class="bar-bg"></div>
+      <div class="bar-bg-wrapper">
+        <div class="bar-base" style="width: {base}%; --bar-color: {color};"></div>
+
+        {#if excess > 0}
+          <div class="bar-excess" style="width: {excess}%;"></div>
+        {/if}
+      </div>
       <div class="row-content">
         <span class="nutrient-name">{row.label}</span>
         <span class="dv-text">
@@ -362,12 +384,23 @@
   }
 
   /* The progress bar fills from left */
-  .bar-bg {
+  .bar-bg-wrapper {
     position: absolute;
     inset: 0;
-    width: var(--bar-pct);
+    display: flex;
+  }
+
+  .bar-base {
+    height: 100%;
     background: var(--bar-color);
     opacity: 0.18;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bar-excess {
+    height: 100%;
+    background: #a855f7; /* purple */
+    opacity: 0.25;
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
