@@ -156,6 +156,7 @@
         {...overview.nutrients}
         class="mx-auto"
         onNutrientClick={showNutrientBreakdown}
+        colorCode={false}
       />
     {:else}
       <div class="flex flex-col items-center gap-2 py-16 text-center">

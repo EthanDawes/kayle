@@ -10,11 +10,13 @@
     servingSize?: string
     class?: string
     onNutrientClick?: (nutrient: NumericNutrientKey, label: string) => void
+    colorCode?: boolean
   }
 
   let {
     class: className = "",
     onNutrientClick = undefined,
+    colorCode = true,
     servingSize = "",
     calories = 0,
     totalFat = 0,
@@ -53,6 +55,7 @@
 
   // Color based on % of DV
   function barColor(p: number): string {
+    if (!colorCode) return "#3b82f6"
     if (p >= 80) return "#ef4444" // red — high
     if (p >= 50) return "#f97316" // orange — moderate
     if (p >= 20) return "#eab308" // yellow — low-moderate
