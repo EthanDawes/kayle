@@ -1,10 +1,16 @@
 <script lang="ts">
   import { onMount } from "svelte"
-  import type { Chart, ChartConfiguration } from "chart.js"
+  import type { Chart, ChartConfiguration, TooltipItem } from "chart.js"
   import { DAILY_VALUES } from "$lib"
+  import { localISODate } from "$lib/integrations/hfsGraphQL"
   import Spinner from "$lib/UI/components/Spinner.svelte"
   import { NutrientTrendsQuery, type NutrientTrendPoint } from "$lib/queries/NutrientTrendsQuery"
   import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
+  import {
+    formatNutrientValue,
+    getNutrientUnit,
+    scaleNutrientValue,
+  } from "$lib/utils/nutrientUnits"
 
   let { nutrient }: { nutrient: NumericNutrientKey } = $props()
 
@@ -18,12 +24,29 @@
   let mounted = false
 
   const label = $derived(NutrientTrendsQuery.labelFor(nutrient))
+  const unit = $derived(getNutrientUnit(nutrient))
   const dailyValue = $derived(DAILY_VALUES[nutrient])
   const labels = $derived(trendPoints.map((p) => p.label))
   const values = $derived(trendPoints.map((p) => p.value))
   const dailyValueLine = $derived(labels.map(() => dailyValue))
-  const total = $derived(values.reduce((a, b) => a + b, 0))
+  const average = $derived.by(() => {
+    const today = localISODate(new Date())
+    const loggedDays = trendPoints.filter((point) => point.hasMeals && point.date !== today)
+    if (!loggedDays.length) return 0
+    return loggedDays.reduce((sum, point) => sum + point.value, 0) / loggedDays.length
+  })
   const peak = $derived(Math.max(...values, 0))
+
+  function tooltipLines(items: TooltipItem<"line">[]): string[] {
+    const point = trendPoints[items[0]?.dataIndex ?? -1]
+    if (!point?.entries.length) return ["No meals logged"]
+    return [
+      "Foods:",
+      ...point.entries.map(
+        (entry) => `${entry.name}: ${formatNutrientValue(nutrient, entry.value)}`,
+      ),
+    ]
+  }
 
   async function load() {
     loading = true
@@ -77,6 +100,35 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
+        interaction: {
+          mode: "index",
+          intersect: false,
+        },
+        scales: {
+          y: {
+            ticks: {
+              callback: (tickValue: string | number) => {
+                const numericValue =
+                  typeof tickValue === "number" ? tickValue : Number.parseFloat(String(tickValue))
+                return Math.round(scaleNutrientValue(nutrient, numericValue))
+              },
+            },
+            title: {
+              display: true,
+              text: unit,
+            },
+          },
+        },
+        plugins: {
+          tooltip: {
+            filter: (item: TooltipItem<"line">) => item.datasetIndex === 0,
+            callbacks: {
+              label: (context: TooltipItem<"line">) =>
+                `${label}: ${formatNutrientValue(nutrient, context.parsed.y ?? 0)}`,
+              afterBody: tooltipLines,
+            },
+          },
+        },
       },
     }
 
@@ -130,16 +182,16 @@
 
     <div class="mt-4 grid grid-cols-3 gap-3 text-xs text-stone-600">
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
-        <p class="text-stone-500 uppercase">7-day total</p>
-        <p class="text-lg text-stone-950">{total.toFixed(2)}</p>
+        <p class="text-stone-500 uppercase">Average</p>
+        <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, average)}</p>
       </div>
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
         <p class="text-stone-500 uppercase">Peak Day</p>
-        <p class="text-lg text-stone-950">{peak.toFixed(2)}</p>
+        <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, peak)}</p>
       </div>
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
         <p class="text-stone-500 uppercase">DV</p>
-        <p class="text-lg text-stone-950">{dailyValue.toFixed(2)}</p>
+        <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, dailyValue)}</p>
       </div>
     </div>
   {/if}
