@@ -45,7 +45,9 @@ export async function processFoodPhoto(
     }, {} as Nutrients)
     console.log(nutrients)
   } else {
-    nutrients = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl, textDescription)
+    const res = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl, textDescription)
+    nutrients = res.nutrients
+    textDescription = res.title
   }
 
   const time = new Date().toLocaleTimeString("en-US", {

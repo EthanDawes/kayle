@@ -2,7 +2,10 @@ import { getAllFoods } from "$lib/integrations/hfsGraphQL"
 import { analyzeImage, analyzeText, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 
-export type FoodAnalysis = Nutrients
+export interface FoodAnalysis {
+  title: string
+  nutrients: Nutrients
+}
 
 export interface ServingAnalysis {
   servings: Record<string, number>
@@ -39,9 +42,10 @@ export const LLMService = {
       : `The user described what they ate as: "${textDescription}". Estimate the nutrition.`
     const prompt = [
       intro,
-      "Return a JSON object with this shape:",
-      FOOD_JSON_SCHEMA,
-      "\nReturn only valid JSON, no markdown fences.",
+      "Return a JSON object with this shape: {",
+      "title: comma-seperated list of things you see, no quantities",
+      "nutrients: " + FOOD_JSON_SCHEMA,
+      "}\nReturn only valid JSON, no markdown fences.",
     ].join("\n")
 
     return imageDataUrl ? analyzeImage(apiKey, imageDataUrl, prompt) : analyzeText(apiKey, prompt)
