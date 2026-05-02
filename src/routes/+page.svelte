@@ -10,6 +10,9 @@
   import { settings } from "$lib/stores/settings.svelte"
   import { localISODate } from "$lib/integrations/hfsGraphQL"
   import Markdown from "svelte-markdown"
+  import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
+  import { formatNutrientValue } from "$lib/utils/nutrientUnits"
+  import { getNutrientBreakdown } from "$lib/utils/nutrientBreakdown"
 
   let overview = $state<DayOverview | null>(null)
   let loading = $state(true)
@@ -69,6 +72,22 @@
       alert(err)
     }
     loadingSuggestions = false
+  }
+
+  function showNutrientBreakdown(nutrient: NumericNutrientKey, label: string) {
+    if (!overview) return
+
+    const foods = getNutrientBreakdown(overview.meals, nutrient)
+    if (!foods.length) {
+      alert(`No foods logged for ${label.toLowerCase()} on ${titleForDate(selectedDate)}.`)
+      return
+    }
+
+    alert(
+      `${label} contributors for ${titleForDate(selectedDate)}:\n\n${foods
+        .map((food) => `${food.name}: ${formatNutrientValue(nutrient, food.value)}`)
+        .join("\n")}`,
+    )
   }
 
   onMount(load)
@@ -133,7 +152,11 @@
     </div>
 
     {#if overview.meals.length > 0}
-      <NutritionLabel {...overview.nutrients} class="mx-auto" />
+      <NutritionLabel
+        {...overview.nutrients}
+        class="mx-auto"
+        onNutrientClick={showNutrientBreakdown}
+      />
     {:else}
       <div class="flex flex-col items-center gap-2 py-16 text-center">
         <span class="text-5xl">&#127869;</span>

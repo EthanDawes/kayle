@@ -1,16 +1,20 @@
 <script lang="ts">
   import { DAILY_VALUES } from "$lib"
   import type { Nutrients } from "$lib/models/meal"
+  import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
+  import { formatNutrientValue } from "$lib/utils/nutrientUnits"
 
   type NutrientKey = Exclude<keyof typeof DAILY_VALUES, "servingSize" | "servingsPerContainer">
 
   interface NutritionProps extends Nutrients {
     servingSize?: string
     class?: string
+    onNutrientClick?: (nutrient: NumericNutrientKey, label: string) => void
   }
 
   let {
     class: className = "",
+    onNutrientClick = undefined,
     servingSize = "",
     calories = 0,
     totalFat = 0,
@@ -39,14 +43,12 @@
     return Math.round(value)
   }
 
-  function fmt(grams: number, unit: "g" | "mg" | "mcg" = "g"): string {
-    if (unit === "mg") return `${whole(grams * 1000)}mg`
-    if (unit === "mcg") return `${whole(grams * 1_000_000)}mcg`
-    return `${whole(grams)}g`
+  function fmt(key: NutrientKey, value: number): string {
+    return formatNutrientValue(key, value)
   }
 
-  function dvFmt(key: NutrientKey, unit: "g" | "mg" | "mcg" = "g"): string {
-    return fmt(DAILY_VALUES[key], unit)
+  function dvFmt(key: NutrientKey): string {
+    return formatNutrientValue(key, DAILY_VALUES[key])
   }
 
   // Color based on % of DV
@@ -61,7 +63,6 @@
     label: string
     key: NutrientKey
     consumed: number
-    unit: "g" | "mg" | "mcg"
     indent?: boolean
     bold?: boolean
     border?: "thick" | "thin" | "none"
@@ -73,7 +74,6 @@
       label: "Total Fat",
       key: "totalFat",
       consumed: totalFat,
-      unit: "g",
       bold: true,
       border: "thick",
     },
@@ -81,7 +81,6 @@
       label: "Saturated Fat",
       key: "saturatedFat",
       consumed: saturatedFat,
-      unit: "g",
       indent: true,
       border: "thin",
     },
@@ -89,7 +88,6 @@
       label: "Trans Fat",
       key: "transFat",
       consumed: transFat,
-      unit: "g",
       indent: true,
       border: "thin",
     },
@@ -97,7 +95,6 @@
       label: "Cholesterol",
       key: "cholesterol",
       consumed: cholesterol,
-      unit: "mg",
       bold: true,
       border: "thick",
     },
@@ -105,7 +102,6 @@
       label: "Sodium",
       key: "sodium",
       consumed: sodium,
-      unit: "mg",
       bold: true,
       border: "thick",
     },
@@ -113,7 +109,6 @@
       label: "Total Carbohydrate",
       key: "totalCarbohydrate",
       consumed: totalCarbohydrate,
-      unit: "g",
       bold: true,
       border: "thick",
     },
@@ -121,7 +116,6 @@
       label: "Dietary Fiber",
       key: "dietaryFiber",
       consumed: dietaryFiber,
-      unit: "g",
       indent: true,
       border: "thin",
     },
@@ -129,7 +123,6 @@
       label: "Total Sugars",
       key: "totalSugars",
       consumed: totalSugars,
-      unit: "g",
       indent: true,
       border: "thin",
     },
@@ -137,7 +130,6 @@
       label: "Includes Added Sugars",
       key: "addedSugars",
       consumed: addedSugars,
-      unit: "g",
       indent: true,
       sub: true,
       border: "thin",
@@ -146,17 +138,16 @@
       label: "Protein",
       key: "protein",
       consumed: protein,
-      unit: "g",
       bold: true,
       border: "thick",
     },
   ])
 
   const microRows: Row[] = $derived([
-    { label: "Vitamin D", key: "vitaminD", consumed: vitaminD, unit: "mcg", border: "thin" },
-    { label: "Calcium", key: "calcium", consumed: calcium, unit: "mg", border: "thin" },
-    { label: "Iron", key: "iron", consumed: iron, unit: "mg", border: "thin" },
-    { label: "Potassium", key: "potassium", consumed: potassium, unit: "mg", border: "none" },
+    { label: "Vitamin D", key: "vitaminD", consumed: vitaminD, border: "thin" },
+    { label: "Calcium", key: "calcium", consumed: calcium, border: "thin" },
+    { label: "Iron", key: "iron", consumed: iron, border: "thin" },
+    { label: "Potassium", key: "potassium", consumed: potassium, border: "none" },
   ])
 </script>
 
@@ -173,13 +164,18 @@
   </div>
 
   <!-- Calories -->
-  <div class="calories-block">
+  <button
+    type="button"
+    class="calories-block nutrient-button"
+    class:clickable={!!onNutrientClick}
+    onclick={() => onNutrientClick?.("calories", "Calories")}
+  >
     <div class="calories-header">
       <span class="amt-per">Amount per serving</span>
       <span class="calories-word">Calories</span>
     </div>
     <span class="calories-num">{whole(calories)}</span>
-  </div>
+  </button>
 
   <div class="dv-header">% Daily Value*</div>
 
@@ -187,26 +183,29 @@
   {#each mainRows as row}
     {@const p = pct(row.key, row.consumed)}
     {@const color = barColor(p)}
-    <div
-      class="nutrient-row"
+    <button
+      type="button"
+      class="nutrient-row nutrient-button"
+      class:clickable={!!onNutrientClick}
       class:indent={row.indent}
       class:sub={row.sub}
       class:thick-border={row.border === "thick"}
       style="--bar-pct: {p}%; --bar-color: {color};"
+      onclick={() => onNutrientClick?.(row.key, row.label)}
     >
       <div class="bar-bg"></div>
       <div class="row-content">
         <span class="nutrient-name" class:bold={row.bold}>
           {row.label}
-          <span class="amount"> {fmt(row.consumed, row.unit)}</span>
+          <span class="amount"> {fmt(row.key, row.consumed)}</span>
         </span>
         {#if DAILY_VALUES[row.key] > 0}
           <span class="dv-text">
-            {fmt(row.consumed, row.unit)} / {dvFmt(row.key, row.unit)}
+            {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
           </span>
         {/if}
       </div>
-    </div>
+    </button>
   {/each}
 
   <!-- Divider -->
@@ -216,19 +215,22 @@
   {#each microRows as row}
     {@const p = pct(row.key, row.consumed)}
     {@const color = barColor(p)}
-    <div
-      class="nutrient-row micro"
+    <button
+      type="button"
+      class="nutrient-row micro nutrient-button"
+      class:clickable={!!onNutrientClick}
       style="--bar-pct: {p}%; --bar-color: {color};"
       class:no-border={row.border === "none"}
+      onclick={() => onNutrientClick?.(row.key, row.label)}
     >
       <div class="bar-bg"></div>
       <div class="row-content">
         <span class="nutrient-name">{row.label}</span>
         <span class="dv-text">
-          {fmt(row.consumed, row.unit)} / {dvFmt(row.key, row.unit)}
+          {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
         </span>
       </div>
-    </div>
+    </button>
   {/each}
 
   <!-- Footer note -->
@@ -288,6 +290,22 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
+  }
+
+  .nutrient-button {
+    width: 100%;
+    background: transparent;
+    color: inherit;
+    text-align: inherit;
+  }
+
+  .nutrient-button.clickable {
+    cursor: pointer;
+  }
+
+  .nutrient-button:focus-visible {
+    outline: 2px solid #ea580c;
+    outline-offset: 2px;
   }
 
   .calories-header {

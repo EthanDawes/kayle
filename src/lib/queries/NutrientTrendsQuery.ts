@@ -1,23 +1,19 @@
 import { localISODate } from "$lib/integrations/hfsGraphQL"
-import type { Meal, Nutrients } from "$lib/models/meal"
+import type { Nutrients } from "$lib/models/meal"
 import { MealRepository } from "$lib/repositories/MealRepository"
 import {
   DiningCourtService,
   NUMERIC_NUTRIENT_LABELS,
   type NumericNutrientKey,
 } from "$lib/services/DiningCourtService"
-
-export interface NutrientTrendEntry {
-  name: string
-  value: number
-}
+import { getNutrientBreakdown, type NutrientContribution } from "$lib/utils/nutrientBreakdown"
 
 export interface NutrientTrendPoint {
   date: string
   label: string
   value: number
   hasMeals: boolean
-  entries: NutrientTrendEntry[]
+  entries: NutrientContribution[]
 }
 
 function addDays(date: Date, amount: number): Date {
@@ -34,22 +30,6 @@ function formatLabel(date: Date): string {
   })
 }
 
-function entriesForMeal(meal: Meal, nutrient: NumericNutrientKey): NutrientTrendEntry[] {
-  if (meal.components?.length) {
-    return meal.components.map((component) => ({
-      name: component.name,
-      value: (component.baseNutrients[nutrient] ?? 0) * component.servings,
-    }))
-  }
-
-  return [
-    {
-      name: meal.name,
-      value: meal.nutrients[nutrient] ?? 0,
-    },
-  ]
-}
-
 export const NutrientTrendsQuery = {
   async forPastWeek(nutrient: NumericNutrientKey): Promise<NutrientTrendPoint[]> {
     const today = new Date()
@@ -58,7 +38,7 @@ export const NutrientTrendsQuery = {
     const start = addDays(today, -6)
     const meals = await MealRepository.getBetweenDates(localISODate(start), localISODate(today))
     const totalsByDate = new Map<string, Nutrients>()
-    const entriesByDate = new Map<string, NutrientTrendEntry[]>()
+    const entriesByDate = new Map<string, NutrientContribution[]>()
     const mealCountsByDate = new Map<string, number>()
 
     for (const meal of meals) {
@@ -66,7 +46,7 @@ export const NutrientTrendsQuery = {
       totalsByDate.set(meal.date, DiningCourtService.addNutrients(current, meal.nutrients))
       entriesByDate.set(meal.date, [
         ...(entriesByDate.get(meal.date) ?? []),
-        ...entriesForMeal(meal, nutrient),
+        ...getNutrientBreakdown([meal], nutrient),
       ])
       mealCountsByDate.set(meal.date, (mealCountsByDate.get(meal.date) ?? 0) + 1)
     }
