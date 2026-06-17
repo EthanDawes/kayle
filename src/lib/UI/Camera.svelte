@@ -129,7 +129,9 @@
     <div
       class="absolute right-0 bottom-0 left-0 z-20 flex flex-col items-center justify-center gap-4 bg-gradient-to-t from-black/65 to-transparent pt-6 pb-10"
     >
-      <button class="rounded-full bg-amber-50 p-1">+ context</button>
+      {#if mode === "food"}
+        <button class="rounded-full bg-amber-50 p-1">+ context</button>
+      {/if}
       <div class="flex flex-row items-center gap-4">
         <a href={resolve("/")} class="size-8 text-2xl">❌</a>
         <!-- Shutter button — centered -->

@@ -1,11 +1,11 @@
-import { DiningCourtService } from "$lib/services/DiningCourtService"
+import { DiningCourtService, type MealDescriptor } from "$lib/services/DiningCourtService"
 import { LLMService } from "$lib/services/LLMService"
 import { settings } from "$lib/stores/settings.svelte"
 import type { MealComponent, Nutrients, NutritionInfo } from "$lib/models/meal"
 
 export async function processFoodPhoto(
   imageDataUrl: string | undefined,
-  diningCourt?: string,
+  diningCourt?: MealDescriptor,
   textDescription?: string,
 ): Promise<NutritionInfo> {
   if (!settings.hasOpenai) {
@@ -56,5 +56,10 @@ export async function processFoodPhoto(
     hour12: true,
   })
 
-  return { nutrients, source: "openai", name: diningCourt ?? textDescription ?? "Meal", components }
+  return {
+    nutrients,
+    source: "openai",
+    name: (diningCourt?.name || textDescription) ?? "Meal",
+    components,
+  }
 }

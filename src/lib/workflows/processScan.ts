@@ -1,18 +1,19 @@
 import { processBarcode } from "./processBarcode"
 import { processFoodPhoto } from "./processFoodPhoto"
 import type { NutritionInfo } from "$lib/models/meal"
+import type { MealDescriptor } from "$lib/services/DiningCourtService"
 
 type ScanMode = "food" | "barcode"
 
 const processors = {
   barcode: processBarcode,
   food: processFoodPhoto,
-}
+} as const
 
 export async function processScan(
   imageDataUrl: string,
   mode: ScanMode,
-  court: string | undefined,
+  court: MealDescriptor | undefined,
 ): Promise<NutritionInfo> {
   return processors[mode](imageDataUrl, court)
 }

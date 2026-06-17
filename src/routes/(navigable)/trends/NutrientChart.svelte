@@ -11,6 +11,7 @@
     getNutrientUnit,
     scaleNutrientValue,
   } from "$lib/utils/nutrientUnits"
+  import { DayOverviewQuery } from "$lib/queries/DayOverviewQuery"
 
   let { nutrient }: { nutrient: NumericNutrientKey } = $props()
 
@@ -30,7 +31,7 @@
   const values = $derived(trendPoints.map((p) => p.value))
   const dailyValueLine = $derived(labels.map(() => dailyValue))
   const average = $derived.by(() => {
-    const today = localISODate(new Date())
+    const today = DayOverviewQuery.today()
     const loggedDays = trendPoints.filter((point) => point.hasMeals && point.date !== today)
     if (!loggedDays.length) return 0
     return loggedDays.reduce((sum, point) => sum + point.value, 0) / loggedDays.length

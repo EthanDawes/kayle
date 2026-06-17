@@ -40,7 +40,7 @@
     "workbox-window": "^7.4.0",
     "wrangler": "^4.85.0"
   },
-  "packageManager": "pnpm@10.33.1+sha512.05ba3c1d5d1c18f68df06470d74055e62d41fc110a0c660db1b2dfb2785327f04cf0f68345d4609bc52089e7fa0343c31593b2f9594e2c5d5da426230acc9820",
+  "packageManager": "pnpm@11.7.0+sha512.19cc852c120c7125760f2443ee6be0ca5b40f9f50598de1a09a1f177503e010e57c23c77646e01e761de59bf874fb22a3398c33ab9691fc13eb946b6f0f4d620",
   "dependencies": {
     "barcode-detector": "^3.1.2",
     "chart.js": "^4.5.1",
@@ -49,6 +49,7 @@
     "graphql-request": "^7.4.0",
     "graphql-tag": "^2.12.6",
     "openai": "^6.34.0",
+    "p-debounce": "^5.1.0",
     "svelte-markdown": "^0.4.1"
   }
 }

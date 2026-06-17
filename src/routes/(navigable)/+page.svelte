@@ -181,7 +181,7 @@
       <div class="z-50 flex flex-col items-end gap-2.5" transition:fly={{ y: 15, duration: 180 }}>
         <!-- Describe (top) -->
         <a
-          href={resolve("/log")}
+          href={resolve("/log?date=" + selectedDate)}
           class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-semibold tracking-wider text-zinc-300 uppercase shadow-xl transition hover:border-zinc-700 hover:text-white"
           onclick={() => (fabOpen = false)}
         >
@@ -191,7 +191,7 @@
 
         <!-- Barcode (middle) -->
         <a
-          href={resolve("/scan?mode=barcode")}
+          href={resolve("/scan?mode=barcode&date=" + selectedDate)}
           class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-semibold tracking-wider text-zinc-300 uppercase shadow-xl transition hover:border-zinc-700 hover:text-white"
           onclick={() => (fabOpen = false)}
         >
@@ -201,7 +201,7 @@
 
         <!-- Camera (bottom) -->
         <a
-          href={resolve("/scan?mode=food")}
+          href={resolve("/scan?mode=food&date=" + selectedDate)}
           class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-semibold tracking-wider text-zinc-300 uppercase shadow-xl transition hover:border-zinc-700 hover:text-white"
           onclick={() => (fabOpen = false)}
         >

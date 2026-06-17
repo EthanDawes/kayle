@@ -1,5 +1,7 @@
 import { GraphQLClient } from "graphql-request"
 import { getSdk } from "./generated"
+import type { MealDescriptor } from "$lib/services/DiningCourtService"
+import { DayOverviewQuery } from "$lib/queries/DayOverviewQuery"
 
 const client = new GraphQLClient("https://kayle.ethand-python.workers.dev")
 
@@ -23,8 +25,9 @@ export function localISODate(today: Date) {
 
 function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
   meals: T[] | null | undefined,
-  now: Date,
+  meal: MealDescriptor,
 ) {
+  const now = new Date(`${meal.date}T${meal.time}`)
   return (
     meals?.filter((meal) => {
       if (!meal.startTime || !meal.endTime) return false
@@ -35,13 +38,12 @@ function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
   )
 }
 
-export async function getLocations() {
-  const now = new Date()
-  const data = await sdk.diningCourts({ date: localISODate(now) })
+export async function getLocations(meal: MealDescriptor, abortSignal?: AbortSignal) {
+  const data = await sdk.diningCourts({ date: meal.date }, undefined, abortSignal)
 
   return (data.diningCourts ?? [])
     .map((court) => {
-      const currentMeals = getCurrentMeals(court?.dailyMenu?.meals, now)
+      const currentMeals = getCurrentMeals(court?.dailyMenu?.meals, meal)
 
       return {
         ...court,
@@ -51,15 +53,13 @@ export async function getLocations() {
     .filter((court) => court.dailyMenu.length > 0)
 }
 
-export async function getMenu(location: string) {
-  const now = new Date()
-
+export async function getMenu(location: MealDescriptor) {
   const data = await sdk.getMenu({
-    date: localISODate(now),
-    location,
+    date: location.date,
+    location: location.name,
   })
 
-  const currentMeals = getCurrentMeals(data.diningCourtByName?.dailyMenu?.meals, now)
+  const currentMeals = getCurrentMeals(data.diningCourtByName?.dailyMenu?.meals, location)
 
   const items = currentMeals.flatMap((meal) =>
     meal.stations.flatMap((station) =>
@@ -81,8 +81,12 @@ export async function getMenu(location: string) {
 }
 
 export async function getAllFoods(): Promise<Record<string, string[]>> {
-  const now = new Date()
-  const data = await sdk.allFoods({ date: localISODate(now) })
+  const now = {
+    name: "all",
+    date: DayOverviewQuery.today(),
+    time: DayOverviewQuery.nowTime(),
+  } satisfies MealDescriptor
+  const data = await sdk.allFoods({ date: now.date })
   return Object.fromEntries(
     data.diningCourts!.map((court) => [
       court?.name,

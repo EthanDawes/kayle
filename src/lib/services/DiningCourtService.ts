@@ -24,6 +24,15 @@ export const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
   "potassium",
 ]
 
+export interface MealDescriptor {
+  // As ISO date yyyy-mm-dd
+  date: string
+  // hh:mm (24-hour). Replaced period name in favor of time, since it may not be obvious that Lawson requires "Breakfast/Lunch" period
+  time: string
+  // Dining court name, not meal period name
+  name: string
+}
+
 export const NUMERIC_NUTRIENT_LABELS: Record<NumericNutrientKey, string> = {
   calories: "Calories",
   totalFat: "Total Fat",
@@ -150,8 +159,8 @@ export const toNutrients = (items: SourceNutrient[]): Nutrients =>
   }, {})
 
 export const DiningCourtService = {
-  async getMenuNutrition(courtName: string): Promise<FoodNutrients> {
-    const menuItems = await getMenu(courtName).catch(() => [])
+  async getMenuNutrition(court: MealDescriptor): Promise<FoodNutrients> {
+    const menuItems = await getMenu(court).catch(() => [])
 
     return Object.fromEntries(
       menuItems.map((item) => [item.name, toNutrients(item.nutritionFacts ?? [])]),
