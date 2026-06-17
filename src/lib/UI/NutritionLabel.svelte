@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { DAILY_VALUES } from "$lib"
+  import { dailyValues } from "$lib/stores/dailyValues.svelte"
   import type { Nutrients } from "$lib/models/meal"
   import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
   import { formatNutrientValue } from "$lib/utils/nutrientUnits"
 
-  type NutrientKey = Exclude<keyof typeof DAILY_VALUES, "servingSize" | "servingsPerContainer">
+  type NutrientKey = Exclude<keyof typeof dailyValues.internal, "servingSize" | "servingsPerContainer">
 
   interface NutritionProps extends Nutrients {
     servingSize?: string
@@ -36,7 +36,7 @@
   }: NutritionProps = $props()
 
   function pctRaw(key: NutrientKey, consumed: number): number {
-    const dv = DAILY_VALUES[key]
+    const dv = dailyValues.internal[key]
     if (!dv || dv === 0) return 0
     return (consumed / dv) * 100
   }
@@ -58,7 +58,7 @@
   }
 
   function dvFmt(key: NutrientKey): string {
-    return formatNutrientValue(key, DAILY_VALUES[key])
+    return formatNutrientValue(key, dailyValues.internal[key])
   }
 
   // Color based on % of DV
@@ -154,12 +154,14 @@
     },
   ])
 
-  const microRows: Row[] = $derived([
-    { label: "Vitamin D", key: "vitaminD", consumed: vitaminD, border: "thin" },
-    { label: "Calcium", key: "calcium", consumed: calcium, border: "thin" },
-    { label: "Iron", key: "iron", consumed: iron, border: "thin" },
-    { label: "Potassium", key: "potassium", consumed: potassium, border: "none" },
-  ])
+  const microRows: Row[] = $derived(
+    [
+      { label: "Vitamin D", key: "vitaminD", consumed: vitaminD, border: "thin" },
+      { label: "Calcium", key: "calcium", consumed: calcium, border: "thin" },
+      { label: "Iron", key: "iron", consumed: iron, border: "thin" },
+      { label: "Potassium", key: "potassium", consumed: potassium, border: "none" },
+    ].filter((r) => dailyValues.internal[r.key as NutrientKey] !== 0) as Row[]
+  )
 </script>
 
 <div class="nutrition-label {className}">
@@ -192,38 +194,41 @@
 
   <!-- Main nutrients -->
   {#each mainRows as row}
+    {@const dv = dailyValues.internal[row.key]}
     {@const pRaw = pctRaw(row.key, row.consumed)}
     {@const base = pctBase(pRaw)}
     {@const excess = pctExcess(pRaw)}
     {@const color = barColor(base)}
-    <button
-      type="button"
-      class="nutrient-row nutrient-button"
-      class:clickable={!!onNutrientClick}
-      class:indent={row.indent}
-      class:sub={row.sub}
-      class:thick-border={row.border === "thick"}
-      onclick={() => onNutrientClick?.(row.key, row.label)}
-    >
-      <div class="bar-bg-wrapper">
-        <div class="bar-base" style="width: {base}%; --bar-color: {color};"></div>
+    {#if dv !== 0 || row.key === "transFat" || row.key === "totalSugars"}
+      <button
+        type="button"
+        class="nutrient-row nutrient-button"
+        class:clickable={!!onNutrientClick}
+        class:indent={row.indent}
+        class:sub={row.sub}
+        class:thick-border={row.border === "thick"}
+        onclick={() => onNutrientClick?.(row.key, row.label)}
+      >
+        <div class="bar-bg-wrapper">
+          <div class="bar-base" style="width: {base}%; --bar-color: {color};"></div>
 
-        {#if excess > 0}
-          <div class="bar-excess" style="width: {excess}%;"></div>
-        {/if}
-      </div>
-      <div class="row-content">
-        <span class="nutrient-name" class:bold={row.bold}>
-          {row.label}
-          <span class="amount"> {fmt(row.key, row.consumed)}</span>
-        </span>
-        {#if DAILY_VALUES[row.key] > 0}
-          <span class="dv-text">
-            {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
+          {#if excess > 0}
+            <div class="bar-excess" style="width: {excess}%;"></div>
+          {/if}
+        </div>
+        <div class="row-content">
+          <span class="nutrient-name" class:bold={row.bold}>
+            {row.label}
+            <span class="amount"> {fmt(row.key, row.consumed)}</span>
           </span>
-        {/if}
-      </div>
-    </button>
+          {#if dv > 0}
+            <span class="dv-text">
+              {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
+            </span>
+          {/if}
+        </div>
+      </button>
+    {/if}
   {/each}
 
   <!-- Divider -->
