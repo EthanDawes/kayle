@@ -7,12 +7,23 @@ function createClient(apiKey: string) {
   })
 }
 
+/*
+Which model to use?
+4o and 5.4-mini are surprisingly the same cost, kinda expensive. I estimated at my usage, would cost $20/yr
+Not bad, but I think I can do better
+
+Deciding between 4o-mini, 5-nano, or 5.4-nano (all roughly same cost, with 5.4 most expensive)
+
+https://developers.openai.com/api/docs/models/all
+https://developers.openai.com/api/docs/pricing
+ */
+
 export async function askAI(apiKey: string, prompt: string): Promise<string> {
   const client = createClient(apiKey)
 
   try {
     const response = await client.responses.create({
-      model: "gpt-5.4-mini",
+      model: "gpt-5.4-nano",
       input: [
         {
           role: "user",
@@ -41,7 +52,7 @@ export async function analyzeText(apiKey: string, prompt: string): Promise<any> 
 
   try {
     const response = await client.responses.create({
-      model: "gpt-5.4-mini",
+      model: "gpt-5.4-nano",
       input: [
         {
           role: "user",
@@ -54,7 +65,8 @@ export async function analyzeText(apiKey: string, prompt: string): Promise<any> 
         },
       },
       reasoning: {
-        effort: "medium",
+        // All models before gpt-5.1 default to medium reasoning effort, and do not support none.
+        effort: "none",
       },
     })
 
@@ -83,7 +95,7 @@ export async function analyzeImage(
 
   try {
     const response = await client.responses.create({
-      model: "gpt-5.4-mini",
+      model: "gpt-5.4-nano",
       input: [
         {
           role: "user",
@@ -103,7 +115,7 @@ export async function analyzeImage(
         },
       },
       reasoning: {
-        effort: "medium",
+        effort: "none",
       },
     })
 
