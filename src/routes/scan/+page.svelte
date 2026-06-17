@@ -18,7 +18,9 @@
   let activeMode = $state<ScanMode>("barcode")
 
   $effect(() => {
-    activeMode = (page.url.searchParams.get("mode") || page.url.searchParams.get("type")) as ScanMode ?? activeMode
+    activeMode =
+      ((page.url.searchParams.get("mode") || page.url.searchParams.get("type")) as ScanMode) ??
+      activeMode
     diningCourt.date = page.url.searchParams.get("date") ?? diningCourt.date
   })
 
@@ -76,7 +78,9 @@
 
 <div class="relative h-full">
   {#if activeMode === "food"}
-    <MealSelector bind:diningCourt />
+    <div class="pointer-events-none absolute inset-x-0 top-0 z-30 p-4">
+      <MealSelector bind:diningCourt />
+    </div>
   {/if}
   <Camera onPhotoCaptured={handleCapture} bind:mode={activeMode} />
 

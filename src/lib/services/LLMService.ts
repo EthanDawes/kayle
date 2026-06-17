@@ -49,7 +49,9 @@ export const LLMService = {
       "}\nReturn only valid JSON, no markdown fences.",
     ].join("\n")
 
-    const result = await (imageDataUrl ? analyzeImage(apiKey, imageDataUrl, prompt) : analyzeText(apiKey, prompt)) as FoodAnalysis
+    const result = (await (imageDataUrl
+      ? analyzeImage(apiKey, imageDataUrl, prompt)
+      : analyzeText(apiKey, prompt))) as FoodAnalysis
     result.nutrients = LLMNutrientsToNormal(result.nutrients)
     return result
   },
