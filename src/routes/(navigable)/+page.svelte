@@ -99,7 +99,11 @@
   <title>Kayle Home</title>
 </svelte:head>
 
-<div class="relative flex h-full w-full flex-col" style="font-family: 'DM Mono', monospace;">
+<div
+  class="relative flex h-full min-h-0 w-full flex-col"
+  style="font-family: 'DM Mono', monospace;"
+>
+  <div class="min-h-0 flex-1 overflow-y-auto">
   <div class="pt-2">
     <div class="flex items-center justify-between gap-3">
       <div>
@@ -164,18 +168,22 @@
       <MealCard {meal} onDelete={deleteMeal} />
     {/each}
   {/if}
+  </div>
 
   <!-- Floating Action Button (FAB) -->
+  {#if fabOpen}
+    <!-- Backdrop to close when clicking outside -->
+    <button
+      tabindex="-1"
+      class="absolute inset-0 z-40 cursor-default bg-transparent outline-none"
+      onclick={() => (fabOpen = false)}
+      type="button"
+      aria-label="Close menu"
+    ></button>
+  {/if}
+
   <div class="absolute right-6 bottom-6 z-50 flex flex-col items-end gap-3">
     {#if fabOpen}
-      <!-- Backdrop to close when clicking outside -->
-      <button
-        tabindex="-1"
-        class="fixed inset-0 z-40 cursor-default bg-transparent outline-none"
-        onclick={() => (fabOpen = false)}
-        type="button"
-        aria-label="Close menu"
-      ></button>
 
       <!-- Speed dial options (stacked bottom to top: camera, barcode, describe) -->
       <div class="z-50 flex flex-col items-end gap-2.5" transition:fly={{ y: 15, duration: 180 }}>
