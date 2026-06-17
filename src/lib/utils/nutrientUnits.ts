@@ -34,6 +34,14 @@ export function scaleNutrientValue(nutrient: NumericNutrientKey, value: number):
   return value
 }
 
+export function unscaleNutrientValue(nutrient: NumericNutrientKey, value: number): number {
+  const unit = getNutrientUnit(nutrient)
+
+  if (unit === "mg") return value * MG
+  if (unit === "mcg") return value * MCG
+  return value
+}
+
 export function formatNutrientValue(nutrient: NumericNutrientKey, value: number): string {
   return `${Math.round(scaleNutrientValue(nutrient, value))} ${getNutrientUnit(nutrient)}`
 }

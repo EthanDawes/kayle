@@ -15,7 +15,7 @@ export async function processFoodPhoto(
   let nutrients: Nutrients
   let components: MealComponent[] | undefined
 
-  if (diningCourt) {
+  if (diningCourt?.name) {
     const menuNutrition = await DiningCourtService.getMenuNutrition(diningCourt)
     console.log(menuNutrition)
     const servingContext = DiningCourtService.getServingSizesContext(menuNutrition)

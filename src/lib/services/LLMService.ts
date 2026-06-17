@@ -1,6 +1,8 @@
 import { getAllFoods } from "$lib/integrations/hfsGraphQL"
 import { analyzeImage, analyzeText, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
+import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
+import { unscaleNutrientValue } from "$lib/utils/nutrientUnits"
 
 export interface FoodAnalysis {
   title: string
@@ -12,23 +14,22 @@ export interface ServingAnalysis {
 }
 
 const FOOD_JSON_SCHEMA = `{
-  // All units are in grams
   calories: number
-  totalFat: number
-  saturatedFat: number
-  transFat: number
-  cholesterol: number
-  sodium: number
-  totalCarbohydrate: number
-  dietaryFiber: number
-  totalSugars: number
-  addedSugars: number
-  protein: number
-  vitaminD: number
-  vitaminC: number
-  calcium: number
-  iron: number
-  potassium: number
+  totalFatGrams: number
+  saturatedFatGrams: number
+  transFatGrams: number
+  cholesterolMilligrams: number
+  sodiumMilligrams: number
+  totalCarbohydrateGrams: number
+  dietaryFiberGrams: number
+  totalSugarsGrams: number
+  addedSugarsGrams: number
+  proteinGrams: number
+  vitaminDMicrograms: number
+  vitaminCMilligrams: number
+  calciumMilligrams: number
+  ironMilligrams: number
+  potassiumMilligrams: number
 }`
 
 export const LLMService = {
@@ -48,7 +49,9 @@ export const LLMService = {
       "}\nReturn only valid JSON, no markdown fences.",
     ].join("\n")
 
-    return imageDataUrl ? analyzeImage(apiKey, imageDataUrl, prompt) : analyzeText(apiKey, prompt)
+    const result = await (imageDataUrl ? analyzeImage(apiKey, imageDataUrl, prompt) : analyzeText(apiKey, prompt)) as FoodAnalysis
+    result.nutrients = LLMNutrientsToNormal(result.nutrients)
+    return result
   },
 
   async analyzeDiningCourtMeal(
@@ -84,4 +87,15 @@ export const LLMService = {
 
     return askAI(apiKey, prompt)
   },
+}
+
+// LLM outputs Nutrients struct, but with units affixed. Example: `totalFatGrams` must become `totalFat`
+// Needed because LLM sometimes doesn't normalize to grams when asked. This will also allow me to use a cheaper non-thinking model.
+function LLMNutrientsToNormal(llmNutrients: Nutrients) {
+  const nutrients: Nutrients = {}
+  for (const [nutrient, quantity] of Object.entries(llmNutrients)) {
+    const noUnitNutrient = nutrient.replace(/Grams|Milligrams|Micrograms/, "") as NumericNutrientKey
+    nutrients[noUnitNutrient] = unscaleNutrientValue(noUnitNutrient, quantity)
+  }
+  return nutrients
 }
