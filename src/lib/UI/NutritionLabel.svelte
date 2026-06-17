@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { DAILY_VALUES } from "$lib"
   import type { Nutrients } from "$lib/models/meal"
   import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
+  import { settings } from "$lib/stores/settings.svelte"
   import { formatNutrientValue } from "$lib/utils/nutrientUnits"
-
-  type NutrientKey = Exclude<keyof typeof DAILY_VALUES, "servingSize" | "servingsPerContainer">
 
   interface NutritionProps extends Nutrients {
     servingSize?: string
@@ -35,9 +33,17 @@
     potassium = 0,
   }: NutritionProps = $props()
 
-  function pctRaw(key: NutrientKey, consumed: number): number {
-    const dv = DAILY_VALUES[key]
-    if (!dv || dv === 0) return 0
+  function dailyValue(key: NumericNutrientKey): number {
+    return settings.dailyValues[key]
+  }
+
+  function isVisible(key: NumericNutrientKey): boolean {
+    return settings.isNutrientVisible(key)
+  }
+
+  function pctRaw(key: NumericNutrientKey, consumed: number): number {
+    const dv = dailyValue(key)
+    if (dv <= 0) return 0
     return (consumed / dv) * 100
   }
 
@@ -53,12 +59,12 @@
     return Math.round(value)
   }
 
-  function fmt(key: NutrientKey, value: number): string {
+  function fmt(key: NumericNutrientKey, value: number): string {
     return formatNutrientValue(key, value)
   }
 
-  function dvFmt(key: NutrientKey): string {
-    return formatNutrientValue(key, DAILY_VALUES[key])
+  function dvFmt(key: NumericNutrientKey): string {
+    return formatNutrientValue(key, dailyValue(key))
   }
 
   // Color based on % of DV
@@ -72,7 +78,7 @@
 
   type Row = {
     label: string
-    key: NutrientKey
+    key: NumericNutrientKey
     consumed: number
     indent?: boolean
     bold?: boolean
@@ -80,86 +86,90 @@
     sub?: boolean // sub-label style
   }
 
-  const mainRows: Row[] = $derived([
-    {
-      label: "Total Fat",
-      key: "totalFat",
-      consumed: totalFat,
-      bold: true,
-      border: "thick",
-    },
-    {
-      label: "Saturated Fat",
-      key: "saturatedFat",
-      consumed: saturatedFat,
-      indent: true,
-      border: "thin",
-    },
-    {
-      label: "Trans Fat",
-      key: "transFat",
-      consumed: transFat,
-      indent: true,
-      border: "thin",
-    },
-    {
-      label: "Cholesterol",
-      key: "cholesterol",
-      consumed: cholesterol,
-      bold: true,
-      border: "thick",
-    },
-    {
-      label: "Sodium",
-      key: "sodium",
-      consumed: sodium,
-      bold: true,
-      border: "thick",
-    },
-    {
-      label: "Total Carbohydrate",
-      key: "totalCarbohydrate",
-      consumed: totalCarbohydrate,
-      bold: true,
-      border: "thick",
-    },
-    {
-      label: "Dietary Fiber",
-      key: "dietaryFiber",
-      consumed: dietaryFiber,
-      indent: true,
-      border: "thin",
-    },
-    {
-      label: "Total Sugars",
-      key: "totalSugars",
-      consumed: totalSugars,
-      indent: true,
-      border: "thin",
-    },
-    {
-      label: "Includes Added Sugars",
-      key: "addedSugars",
-      consumed: addedSugars,
-      indent: true,
-      sub: true,
-      border: "thin",
-    },
-    {
-      label: "Protein",
-      key: "protein",
-      consumed: protein,
-      bold: true,
-      border: "thick",
-    },
-  ])
+  const mainRows: Row[] = $derived.by(() =>
+    [
+      {
+        label: "Total Fat",
+        key: "totalFat",
+        consumed: totalFat,
+        bold: true,
+        border: "thick",
+      },
+      {
+        label: "Saturated Fat",
+        key: "saturatedFat",
+        consumed: saturatedFat,
+        indent: true,
+        border: "thin",
+      },
+      {
+        label: "Trans Fat",
+        key: "transFat",
+        consumed: transFat,
+        indent: true,
+        border: "thin",
+      },
+      {
+        label: "Cholesterol",
+        key: "cholesterol",
+        consumed: cholesterol,
+        bold: true,
+        border: "thick",
+      },
+      {
+        label: "Sodium",
+        key: "sodium",
+        consumed: sodium,
+        bold: true,
+        border: "thick",
+      },
+      {
+        label: "Total Carbohydrate",
+        key: "totalCarbohydrate",
+        consumed: totalCarbohydrate,
+        bold: true,
+        border: "thick",
+      },
+      {
+        label: "Dietary Fiber",
+        key: "dietaryFiber",
+        consumed: dietaryFiber,
+        indent: true,
+        border: "thin",
+      },
+      {
+        label: "Total Sugars",
+        key: "totalSugars",
+        consumed: totalSugars,
+        indent: true,
+        border: "thin",
+      },
+      {
+        label: "Includes Added Sugars",
+        key: "addedSugars",
+        consumed: addedSugars,
+        indent: true,
+        sub: true,
+        border: "thin",
+      },
+      {
+        label: "Protein",
+        key: "protein",
+        consumed: protein,
+        bold: true,
+        border: "thick",
+      },
+    ].filter((row) => isVisible(row.key)),
+  )
 
-  const microRows: Row[] = $derived([
-    { label: "Vitamin D", key: "vitaminD", consumed: vitaminD, border: "thin" },
-    { label: "Calcium", key: "calcium", consumed: calcium, border: "thin" },
-    { label: "Iron", key: "iron", consumed: iron, border: "thin" },
-    { label: "Potassium", key: "potassium", consumed: potassium, border: "none" },
-  ])
+  const microRows: Row[] = $derived.by(() =>
+    [
+      { label: "Vitamin D", key: "vitaminD", consumed: vitaminD, border: "thin" },
+      { label: "Calcium", key: "calcium", consumed: calcium, border: "thin" },
+      { label: "Iron", key: "iron", consumed: iron, border: "thin" },
+      { label: "Potassium", key: "potassium", consumed: potassium, border: "none" },
+    ].filter((row) => isVisible(row.key)),
+  )
 </script>
 
 <div class="nutrition-label {className}">
@@ -175,18 +185,20 @@
   </div>
 
   <!-- Calories -->
-  <button
-    type="button"
-    class="calories-block nutrient-button"
-    class:clickable={!!onNutrientClick}
-    onclick={() => onNutrientClick?.("calories", "Calories")}
-  >
-    <div class="calories-header">
-      <span class="amt-per">Amount per serving</span>
-      <span class="calories-word">Calories</span>
-    </div>
-    <span class="calories-num">{whole(calories)}</span>
-  </button>
+  {#if isVisible("calories")}
+    <button
+      type="button"
+      class="calories-block nutrient-button"
+      class:clickable={!!onNutrientClick}
+      onclick={() => onNutrientClick?.("calories", "Calories")}
+    >
+      <div class="calories-header">
+        <span class="amt-per">Amount per serving</span>
+        <span class="calories-word">Calories</span>
+      </div>
+      <span class="calories-num">{whole(calories)}</span>
+    </button>
+  {/if}
 
   <div class="dv-header">% Daily Value*</div>
 
@@ -217,7 +229,7 @@
           {row.label}
           <span class="amount"> {fmt(row.key, row.consumed)}</span>
         </span>
-        {#if DAILY_VALUES[row.key] > 0}
+        {#if dailyValue(row.key) > 0}
           <span class="dv-text">
             {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
           </span>
@@ -251,9 +263,13 @@
       </div>
       <div class="row-content">
         <span class="nutrient-name">{row.label}</span>
-        <span class="dv-text">
-          {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
-        </span>
+        {#if dailyValue(row.key) > 0}
+          <span class="dv-text">
+            {fmt(row.key, row.consumed)} / {dvFmt(row.key)}
+          </span>
+        {:else}
+          <span class="dv-text">{fmt(row.key, row.consumed)}</span>
+        {/if}
       </div>
     </button>
   {/each}
