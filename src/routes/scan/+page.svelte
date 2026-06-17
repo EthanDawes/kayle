@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
   import { goto } from "$app/navigation"
+  import { page } from "$app/state"
   import Camera from "$lib/UI/Camera.svelte"
   import LoadingOverlay from "$lib/UI/LoadingOverlay.svelte"
   import ResultCard from "$lib/UI/ResultCard.svelte"
@@ -19,6 +20,17 @@
 
   type ScanState = "idle" | "processing" | "result" | "error"
   type ScanMode = "food" | "barcode"
+
+  const modeParam = $derived(page.url.searchParams.get("mode") || page.url.searchParams.get("type"))
+  let activeMode = $state<ScanMode>("food")
+
+  $effect(() => {
+    if (modeParam === "barcode") {
+      activeMode = "barcode"
+    } else {
+      activeMode = "food"
+    }
+  })
 
   let cameraState = $state<ScanState>("idle")
   let capturedImage = $state<string | null>(null)
@@ -41,7 +53,14 @@
 
       const courtsWithCoordinates = diningCourts.flatMap((court) =>
         court.latitude != null && court.longitude != null
-          ? [{ name: court.name, latitude: court.latitude, longitude: court.longitude, category: court.category }]
+          ? [
+              {
+                name: court.name,
+                latitude: court.latitude,
+                longitude: court.longitude,
+                category: court.category,
+              },
+            ]
           : [],
       )
 
@@ -158,7 +177,7 @@
     </div>
   </div>
 
-  <Camera onPhotoCaptured={handleCapture} />
+  <Camera onPhotoCaptured={handleCapture} bind:mode={activeMode} />
 
   {#if cameraState === "processing"}
     <LoadingOverlay message={statusMessage} />

@@ -6,14 +6,14 @@
 
   interface Props {
     onPhotoCaptured: (photo: string, mode: Mode) => void
+    mode?: Mode
   }
 
-  let { onPhotoCaptured }: Props = $props()
+  let { onPhotoCaptured, mode = $bindable("food") }: Props = $props()
 
   let videoEl = $state<HTMLVideoElement | null>(null)
   let canvasEl = $state<HTMLCanvasElement | null>(null)
   let stream = $state<MediaStream | null>(null)
-  let mode = $state<Mode>("food")
   let error = $state("")
   let cameraReady = $state(false)
   let capturing = $state(false)

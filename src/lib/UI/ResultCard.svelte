@@ -41,7 +41,8 @@
     onConfirm({
       ...result,
       nutrients: scaledNutrients,
-      components: editableComponents.length > 0 ? editableComponents.map((c) => ({ ...c })) : undefined,
+      components:
+        editableComponents.length > 0 ? editableComponents.map((c) => ({ ...c })) : undefined,
     })
   }
 </script>

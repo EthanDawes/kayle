@@ -13,12 +13,14 @@
   import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
   import { formatNutrientValue } from "$lib/utils/nutrientUnits"
   import { getNutrientBreakdown } from "$lib/utils/nutrientBreakdown"
+  import { fly } from "svelte/transition"
 
   let overview = $state<DayOverview | null>(null)
   let loading = $state(true)
   let suggestedMeal = $state("")
   let loadingSuggestions = $state(false)
   let selectedDate = $state(DayOverviewQuery.today())
+  let fabOpen = $state(false)
 
   function addDays(date: string, amount: number) {
     const nextDate = new Date(`${date}T00:00:00`)
@@ -97,7 +99,7 @@
   <title>Kayle Home</title>
 </svelte:head>
 
-<div class="flex h-full w-full flex-col" style="font-family: 'DM Mono', monospace;">
+<div class="relative flex h-full w-full flex-col" style="font-family: 'DM Mono', monospace;">
   <div class="pt-2">
     <div class="flex items-center justify-between gap-3">
       <div>
@@ -162,6 +164,63 @@
       <MealCard {meal} onDelete={deleteMeal} />
     {/each}
   {/if}
+
+  <!-- Floating Action Button (FAB) -->
+  <div class="absolute right-6 bottom-6 z-50 flex flex-col items-end gap-3">
+    {#if fabOpen}
+      <!-- Backdrop to close when clicking outside -->
+      <button
+        tabindex="-1"
+        class="fixed inset-0 z-40 cursor-default bg-transparent outline-none"
+        onclick={() => (fabOpen = false)}
+        type="button"
+        aria-label="Close menu"
+      ></button>
+
+      <!-- Speed dial options (stacked bottom to top: camera, barcode, describe) -->
+      <div class="z-50 flex flex-col items-end gap-2.5" transition:fly={{ y: 15, duration: 180 }}>
+        <!-- Describe (top) -->
+        <a
+          href={resolve("/log")}
+          class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-semibold tracking-wider text-zinc-300 uppercase shadow-xl transition hover:border-zinc-700 hover:text-white"
+          onclick={() => (fabOpen = false)}
+        >
+          <span>✏️</span>
+          <span>Describe</span>
+        </a>
+
+        <!-- Barcode (middle) -->
+        <a
+          href={resolve("/scan?mode=barcode")}
+          class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-semibold tracking-wider text-zinc-300 uppercase shadow-xl transition hover:border-zinc-700 hover:text-white"
+          onclick={() => (fabOpen = false)}
+        >
+          <span>📦</span>
+          <span>Barcode</span>
+        </a>
+
+        <!-- Camera (bottom) -->
+        <a
+          href={resolve("/scan?mode=food")}
+          class="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-semibold tracking-wider text-zinc-300 uppercase shadow-xl transition hover:border-zinc-700 hover:text-white"
+          onclick={() => (fabOpen = false)}
+        >
+          <span>📷</span>
+          <span>Camera</span>
+        </a>
+      </div>
+    {/if}
+
+    <!-- Main FAB Button -->
+    <button
+      onclick={() => (fabOpen = !fabOpen)}
+      class="z-50 flex h-14 w-14 items-center justify-center rounded-2xl border border-zinc-800 bg-white text-zinc-950 shadow-2xl transition hover:scale-105 focus:outline-none active:scale-95"
+      aria-label="Add meal"
+      type="button"
+    >
+      <span class="text-2xl transition-transform duration-200" class:rotate-45={fabOpen}> ➕ </span>
+    </button>
+  </div>
 </div>
 
 <style>
