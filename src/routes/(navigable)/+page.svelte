@@ -107,13 +107,6 @@
         <h1 class="text-2xl font-bold text-white">{titleForDate(selectedDate)}</h1>
       </div>
       <div class="flex items-center gap-2">
-        <a
-          href={resolve("/trends")}
-          class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800"
-          aria-label="View nutrient trends"
-        >
-          <span aria-hidden="true">&#128200;</span>
-        </a>
         <button
           class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800"
           onclick={goToPreviousDay}
