@@ -231,12 +231,18 @@
   <title>Kayle Log</title>
 </svelte:head>
 
-<div class="relative flex flex-col gap-5 p-5">
+<div
+  class="relative flex min-h-full flex-col gap-5 bg-stone-50 p-5 text-stone-900"
+  style="font-family: 'DM Mono', monospace;"
+>
   <MealSelector bind:diningCourt />
 
   <!-- Single line description -->
   <div class="flex flex-col gap-2">
-    <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="description">
+    <label
+      class="text-xs font-semibold tracking-[0.2em] text-stone-500 uppercase"
+      for="description"
+    >
       Describe what you ate
     </label>
     <input
@@ -244,7 +250,7 @@
       type="text"
       bind:value={description}
       placeholder="e.g. Scrambled eggs, wheat toast, orange juice..."
-      class="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-zinc-500"
+      class="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 placeholder-stone-400 shadow-sm outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500"
       onkeydown={(e) => {
         if (e.key === "Enter" && description.trim() && !analyzing) {
           analyze()
@@ -254,8 +260,8 @@
   </div>
 
   {#if error}
-    <div class="rounded-xl border border-red-900 bg-red-950/20 p-4">
-      <p class="text-xs leading-relaxed text-red-400">
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+      <p class="text-xs leading-relaxed text-red-600">
         {error}
       </p>
     </div>
@@ -264,7 +270,7 @@
   <button
     onclick={analyze}
     disabled={!description.trim() || analyzing}
-    class="w-full rounded-full bg-white py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+    class="w-full rounded-full bg-stone-900 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
     type="button"
   >
     Analyse
@@ -274,12 +280,16 @@
     <!-- Servings with quantities set -->
     {#if editableComponents.length > 0}
       <div class="mt-4">
-        <h3 class="mb-3 text-xs tracking-[0.2em] text-zinc-400 uppercase">Selected Items</h3>
+        <h3 class="mb-3 text-xs font-semibold tracking-[0.2em] text-stone-500 uppercase">
+          Selected Items
+        </h3>
         <div class="mb-4 space-y-2">
           {#each editableComponents as comp (comp.name)}
             <div class="flex items-center gap-2">
-              <span class="min-w-0 flex-1 truncate text-sm text-zinc-300">{comp.name}</span>
-              <span class="shrink-0 text-xs text-zinc-500">{comp.servingSize}</span>
+              <span class="min-w-0 flex-1 truncate text-sm font-medium text-stone-800"
+                >{comp.name}</span
+              >
+              <span class="shrink-0 text-xs text-stone-500">{comp.servingSize}</span>
               <input
                 type="number"
                 min="0"
@@ -288,7 +298,7 @@
                 oninput={(e) => {
                   servingsOverride[comp.name] = Number(e.currentTarget.value)
                 }}
-                class="w-20 shrink-0 rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-1 text-sm text-white outline-none focus:border-zinc-500"
+                class="w-20 shrink-0 rounded-lg border border-stone-300 bg-white px-2 py-1 text-sm text-stone-900 outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500"
               />
             </div>
           {/each}
@@ -302,7 +312,7 @@
         <!-- Save button -->
         <button
           onclick={saveDiningCourtMeal}
-          class="mb-4 w-full rounded-full bg-white py-3 text-sm font-semibold text-zinc-900 transition-opacity hover:opacity-90"
+          class="mb-4 w-full rounded-full bg-stone-900 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
           type="button"
         >
           Save Meal
@@ -310,13 +320,13 @@
       </div>
     {/if}
 
-    <hr class="my-4 border-zinc-800" />
+    <hr class="my-4 border-stone-200" />
 
     <!-- All items in dining court, grouped by station -->
     {#if menuLoading}
-      <div class="py-8 text-center text-sm text-zinc-500">Loading menu...</div>
+      <div class="py-8 text-center text-sm text-stone-500">Loading menu...</div>
     {:else if stations.length === 0}
-      <div class="py-8 text-center text-sm text-zinc-500">
+      <div class="py-8 text-center text-sm text-stone-500">
         No menu items found for the selected date/time.
       </div>
     {:else}
@@ -324,7 +334,7 @@
         {#each stations as station (station.name)}
           <div>
             <h3
-              class="mb-2 border-b border-zinc-800 pb-1 text-sm font-bold tracking-wider text-zinc-400 uppercase"
+              class="mb-2 border-b border-stone-200 pb-1 text-sm font-bold tracking-wider text-stone-600 uppercase"
             >
               {station.name}
             </h3>
@@ -333,8 +343,10 @@
                 {@const details = itemDetails[item.name]}
                 {@const servingSize = details?.servingSize || ""}
                 <div class="flex items-center gap-2">
-                  <span class="min-w-0 flex-1 truncate text-sm text-zinc-300">{item.name}</span>
-                  <span class="shrink-0 text-xs text-zinc-500">{servingSize}</span>
+                  <span class="min-w-0 flex-1 truncate text-sm font-medium text-stone-800"
+                    >{item.name}</span
+                  >
+                  <span class="shrink-0 text-xs text-stone-500">{servingSize}</span>
                   <input
                     type="number"
                     min="0"
@@ -343,7 +355,7 @@
                     oninput={(e) => {
                       servingsOverride[item.name] = Number(e.currentTarget.value)
                     }}
-                    class="w-20 shrink-0 rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-1 text-sm text-white outline-none focus:border-zinc-500"
+                    class="w-20 shrink-0 rounded-lg border border-stone-300 bg-white px-2 py-1 text-sm text-stone-900 outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500"
                   />
                 </div>
               {/each}
