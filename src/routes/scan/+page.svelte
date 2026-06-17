@@ -18,8 +18,8 @@
   let activeMode = $state<ScanMode>("barcode")
 
   $effect(() => {
-    activeMode ??= (page.url.searchParams.get("mode") || page.url.searchParams.get("type")) as ScanMode
-    diningCourt.date ??= page.url.searchParams.get("date") as string
+    activeMode = (page.url.searchParams.get("mode") || page.url.searchParams.get("type")) as ScanMode ?? activeMode
+    diningCourt.date = page.url.searchParams.get("date") ?? diningCourt.date
   })
 
   let cameraState = $state<ScanState>("idle")
