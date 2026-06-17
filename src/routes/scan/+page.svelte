@@ -15,21 +15,17 @@
   type ScanState = "idle" | "processing" | "result" | "error"
   type ScanMode = "food" | "barcode"
 
-  const modeParam = $derived(page.url.searchParams.get("mode") || page.url.searchParams.get("type"))
-  let activeMode = $state<ScanMode>("food")
+  let activeMode = $state<ScanMode>("barcode")
 
   $effect(() => {
-    if (modeParam === "barcode") {
-      activeMode = "barcode"
-    } else {
-      activeMode = "food"
-    }
+    activeMode ??= (page.url.searchParams.get("mode") || page.url.searchParams.get("type")) as ScanMode
+    diningCourt.date ??= page.url.searchParams.get("date") as string
   })
 
   let cameraState = $state<ScanState>("idle")
   let capturedImage = $state<string | null>(null)
   let diningCourt = $state<MealDescriptor>({
-    date: page.url.searchParams.get("date") || DayOverviewQuery.today(),
+    date: DayOverviewQuery.today(),
     time: DayOverviewQuery.nowTime(),
     name: "",
   })
@@ -79,7 +75,7 @@
 </svelte:head>
 
 <div class="relative h-full">
-  {#if modeParam === "food"}
+  {#if activeMode === "food"}
     <MealSelector bind:diningCourt />
   {/if}
   <Camera onPhotoCaptured={handleCapture} bind:mode={activeMode} />
