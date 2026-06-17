@@ -916,6 +916,7 @@ export type GetMenuQuery = {
         endTime?: any | null
         stations: Array<{
           __typename?: "Station"
+          name?: string | null
           items: Array<{
             __typename?: "ItemAppearance"
             components?: Array<{
@@ -994,6 +995,7 @@ export const GetMenuDocument = gql`
           startTime
           endTime
           stations {
+            name
             items {
               components {
                 item {

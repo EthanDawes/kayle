@@ -15,5 +15,8 @@ export async function processScan(
   mode: ScanMode,
   court: MealDescriptor | undefined,
 ): Promise<NutritionInfo> {
-  return processors[mode](imageDataUrl, court)
+  if (mode === "food") {
+    return processFoodPhoto(imageDataUrl, court)
+  }
+  return processBarcode(imageDataUrl)
 }

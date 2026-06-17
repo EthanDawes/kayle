@@ -23,7 +23,7 @@ export function localISODate(today: Date) {
   ].join("-")
 }
 
-function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
+export function getCurrentMeals<T extends { startTime?: any; endTime?: any }>(
   meals: T[] | null | undefined,
   meal: MealDescriptor,
 ) {
@@ -97,4 +97,4 @@ export async function getAllFoods(): Promise<Record<string, string[]>> {
   )
 }
 
-globalThis.getLocations = getLocations
+;(globalThis as any).getLocations = getLocations

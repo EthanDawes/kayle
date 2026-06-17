@@ -5,6 +5,7 @@ query getMenu($location: String!, $date: Date!) {
         startTime
         endTime
         stations {
+          name
           items {
             components {
               item {
