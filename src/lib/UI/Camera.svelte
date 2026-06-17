@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte"
   import Spinner from "./components/Spinner.svelte"
+  import { resolve } from "$app/paths"
 
   type Mode = "food" | "barcode"
 
@@ -128,66 +129,32 @@
     <div
       class="absolute right-0 bottom-0 left-0 z-20 flex flex-col items-center justify-center gap-4 bg-gradient-to-t from-black/65 to-transparent pt-6 pb-10"
     >
-      <!-- Shutter button — centered -->
-      <button
-        onclick={capture}
-        disabled={!cameraReady || capturing}
-        aria-label="Take photo"
-        class="
+      <button class="rounded-full bg-amber-50 p-1">+ context</button>
+      <div class="flex flex-row items-center gap-4">
+        <a href={resolve("/")} class="size-8 text-2xl">❌</a>
+        <!-- Shutter button — centered -->
+        <button
+          onclick={capture}
+          disabled={!cameraReady || capturing}
+          aria-label="Take photo"
+          class="
           relative flex h-20 w-20 items-center justify-center rounded-full
           transition-transform duration-100
           focus:outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-50
         "
-      >
-        <!-- Outer ring -->
-        <span
-          class="absolute inset-0 rounded-full border-[3px] border-white/80 shadow-[0_0_18px_rgba(255,255,255,0.18)]"
-        ></span>
-        <!-- Inner disc -->
-        <span
-          class="h-15.5 w-15.5 rounded-full bg-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.12)] transition-all duration-100"
-          class:scale-90={capturing}
-          class:bg-zinc-200={capturing}
-        ></span>
-      </button>
-
-      <!-- ── TOP: Mode segmented control ── -->
-      <div>
-        <!--
-          Pill container: soft light background + shadow, fully rounded pill shape.
-          Active option gets a white "floating" card with drop shadow (like the image).
-        -->
-        <div
-          class="flex items-center gap-0 rounded-full bg-black/25 p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.25)] backdrop-blur-md"
         >
-          <!-- Food option -->
-          <button
-            onclick={() => (mode = "food")}
-            class="
-              relative rounded-full px-5 py-1.5 text-sm font-semibold tracking-wide transition-all
-              duration-200 focus:outline-none
-              {mode === 'food'
-              ? 'bg-white text-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.22)]'
-              : 'text-white/60 hover:text-white/80'}
-            "
-          >
-            🍽 Food
-          </button>
-
-          <!-- Barcode option -->
-          <button
-            onclick={() => (mode = "barcode")}
-            class="
-              relative rounded-full px-5 py-1.5 text-sm font-semibold tracking-wide transition-all
-              duration-200 focus:outline-none
-              {mode === 'barcode'
-              ? 'bg-white text-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.22)]'
-              : 'text-white/60 hover:text-white/80'}
-            "
-          >
-            📦 Barcode
-          </button>
-        </div>
+          <!-- Outer ring -->
+          <span
+            class="absolute inset-0 rounded-full border-[3px] border-white/80 shadow-[0_0_18px_rgba(255,255,255,0.18)]"
+          ></span>
+          <!-- Inner disc -->
+          <span
+            class="h-15.5 w-15.5 rounded-full bg-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.12)] transition-all duration-100"
+            class:scale-90={capturing}
+            class:bg-zinc-200={capturing}
+          ></span>
+        </button>
+        <div class="size-8"></div>
       </div>
     </div>
   {/if}
