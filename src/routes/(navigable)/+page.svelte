@@ -104,70 +104,70 @@
   style="font-family: 'DM Mono', monospace;"
 >
   <div class="min-h-0 flex-1 overflow-y-auto">
-  <div class="pt-2">
-    <div class="flex items-center justify-between gap-3">
-      <div>
-        <p class="text-xs tracking-[0.2em] text-zinc-500 uppercase">
-          {formatDateLabel(selectedDate)}
-        </p>
-        <h1 class="text-2xl font-bold text-white">{titleForDate(selectedDate)}</h1>
+    <div class="pt-2">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <p class="text-xs tracking-[0.2em] text-zinc-500 uppercase">
+            {formatDateLabel(selectedDate)}
+          </p>
+          <h1 class="text-2xl font-bold text-white">{titleForDate(selectedDate)}</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800"
+            onclick={goToPreviousDay}
+            aria-label="Show previous day"
+          >
+            <span aria-hidden="true">&larr;</span>
+          </button>
+          <button
+            class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+            onclick={goToNextDay}
+            disabled={!canGoForward}
+            aria-label="Show next day"
+          >
+            <span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800"
-          onclick={goToPreviousDay}
-          aria-label="Show previous day"
-        >
-          <span aria-hidden="true">&larr;</span>
-        </button>
-        <button
-          class="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-lg text-white transition hover:border-zinc-700 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
-          onclick={goToNextDay}
-          disabled={!canGoForward}
-          aria-label="Show next day"
-        >
-          <span aria-hidden="true">&rarr;</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  {#if loading}
-    <div class="flex items-center justify-center py-16">
-      <Spinner />
-    </div>
-  {:else if overview}
-    <!-- Day summary page -->
-    {#if DayOverviewQuery.today() == selectedDate}
-      <button class="mb-2 cursor-pointer border" onclick={loadSuggestedMeals}>
-        Suggest meals
-        {#if loadingSuggestions}
-          <Spinner style="width: 10px; height: 10px" />
-        {/if}
-      </button>
-    {/if}
-    <div class="md">
-      <Markdown source={suggestedMeal} />
     </div>
 
-    {#if overview.meals.length > 0}
-      <NutritionLabel
-        {...overview.nutrients}
-        class="mx-auto"
-        onNutrientClick={showNutrientBreakdown}
-        colorCode={false}
-      />
-    {:else}
-      <div class="flex flex-col items-center gap-2 py-16 text-center">
-        <span class="text-5xl">&#127869;</span>
-        <p class="text-sm text-zinc-500">Nothing logged yet.</p>
-        <p class="text-xs text-zinc-600">Tap Scan to get started.</p>
+    {#if loading}
+      <div class="flex items-center justify-center py-16">
+        <Spinner />
       </div>
+    {:else if overview}
+      <!-- Day summary page -->
+      {#if DayOverviewQuery.today() == selectedDate}
+        <button class="mb-2 w-full cursor-pointer border" onclick={loadSuggestedMeals}>
+          Suggest meals
+          {#if loadingSuggestions}
+            <Spinner style="width: 10px; height: 10px" />
+          {/if}
+        </button>
+      {/if}
+      <div class="md">
+        <Markdown source={suggestedMeal} />
+      </div>
+
+      {#if overview.meals.length > 0}
+        <NutritionLabel
+          {...overview.nutrients}
+          class="mx-auto"
+          onNutrientClick={showNutrientBreakdown}
+          colorCode={false}
+        />
+      {:else}
+        <div class="flex flex-col items-center gap-2 py-16 text-center">
+          <span class="text-5xl">&#127869;</span>
+          <p class="text-sm text-zinc-500">Nothing logged yet.</p>
+          <p class="text-xs text-zinc-600">Tap Scan to get started.</p>
+        </div>
+      {/if}
+      {#each overview.meals.toReversed() as meal (meal.id)}
+        <MealCard {meal} onDelete={deleteMeal} />
+      {/each}
     {/if}
-    {#each overview.meals.toReversed() as meal (meal.id)}
-      <MealCard {meal} onDelete={deleteMeal} />
-    {/each}
-  {/if}
   </div>
 
   <!-- Floating Action Button (FAB) -->
@@ -184,7 +184,6 @@
 
   <div class="absolute right-6 bottom-6 z-50 flex flex-col items-end gap-3">
     {#if fabOpen}
-
       <!-- Speed dial options (stacked bottom to top: camera, barcode, describe) -->
       <div class="z-50 flex flex-col items-end gap-2.5" transition:fly={{ y: 15, duration: 180 }}>
         <!-- Describe (top) -->

@@ -150,7 +150,11 @@
           entirely. Values save automatically.
         </p>
         <p class="text-xs">
-          <a href="https://www.nal.usda.gov/human-nutrition-and-food-safety/dri-calculator" target="_blank" class="underline text-blue-500 hover:text-blue-300">
+          <a
+            href="https://www.nal.usda.gov/human-nutrition-and-food-safety/dri-calculator"
+            target="_blank"
+            class="text-blue-500 underline hover:text-blue-300"
+          >
             USDA Daily Value Calculator
           </a>
         </p>
