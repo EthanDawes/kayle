@@ -182,7 +182,7 @@
     ></button>
   {/if}
 
-  <div class="absolute right-6 bottom-6 z-50 flex flex-col items-end gap-3">
+  <div class="absolute right-6 bottom-6 z-40 flex flex-col items-end gap-3">
     {#if fabOpen}
       <!-- Speed dial options (stacked bottom to top: camera, barcode, describe) -->
       <div class="z-50 flex flex-col items-end gap-2.5" transition:fly={{ y: 15, duration: 180 }}>
