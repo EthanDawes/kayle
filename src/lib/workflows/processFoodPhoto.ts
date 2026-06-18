@@ -37,6 +37,20 @@ export async function processFoodPhoto(
       baseNutrients: { ...menuNutrition[name] },
     }))
 
+    // Add any food items that were not on the menu (ex. limited time items)
+    // TODO: I _could_ have a cache of all the possible old dining court menus, but that seems like more work than it's worth, considering how uncommon that is
+    if (servingAnalysis.unknowns?.length > 0) {
+      const unknownsDescription = servingAnalysis.unknowns.join(", ")
+      const unknownsNutrients = (await processFoodPhoto(undefined, undefined, unknownsDescription))
+        .nutrients
+      components.push({
+        name: unknownsDescription,
+        servings: 1,
+        servingSize: "combined",
+        baseNutrients: unknownsNutrients,
+      })
+    }
+
     nutrients = components.reduce((acc, comp) => {
       return DiningCourtService.addNutrients(
         acc,

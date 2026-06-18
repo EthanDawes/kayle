@@ -11,6 +11,7 @@ export interface FoodAnalysis {
 
 export interface ServingAnalysis {
   servings: Record<string, number>
+  unknowns: string[]
 }
 
 const FOOD_JSON_SCHEMA = `{
@@ -66,10 +67,11 @@ export const LLMService = {
       ? "the food in this image"
       : `what the user described: "${textDescription}"`
     const prompt = [
-      "Here are some foods and their serving sizes:",
+      "Here are some foods and their serving sizes (menu context):",
       menuContext,
       "",
-      `Now, analyze ${foodSource} and respond with a JSON object: {servings: map of the food items with a multiple of its serving size}`,
+      `Now, analyze ${foodSource}.`,
+      "Respond with a JSON object: {servings: map of the food items with a multiple of its serving size, unknowns: list of foods and portion consumed that aren't in the menu context, but included in the analysis}",
       "Return only valid JSON, no markdown fences.",
     ].join("\n")
 
