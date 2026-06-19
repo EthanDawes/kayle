@@ -1,0 +1,11 @@
+project: true
+completed: false
+archived: false
+era: purdue
+topic:
+- health
+technology:
+- sveltekit
+- ai
+language: typescript
+dependencies: []
