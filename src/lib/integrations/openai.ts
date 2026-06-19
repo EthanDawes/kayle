@@ -66,7 +66,7 @@ export async function analyzeText(apiKey: string, prompt: string): Promise<any> 
       },
       reasoning: {
         // All models before gpt-5.1 default to medium reasoning effort, and do not support none.
-        effort: "none",
+        effort: "medium",
       },
     })
 
@@ -115,7 +115,7 @@ export async function analyzeImage(
         },
       },
       reasoning: {
-        effort: "none",
+        effort: "medium",
       },
     })
 
