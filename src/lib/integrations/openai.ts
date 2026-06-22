@@ -52,7 +52,7 @@ export async function analyzeText(apiKey: string, prompt: string): Promise<any> 
 
   try {
     const response = await client.responses.create({
-      model: "gpt-5.4-nano",
+      model: "gpt-5.4-mini",
       input: [
         {
           role: "user",
@@ -95,7 +95,7 @@ export async function analyzeImage(
 
   try {
     const response = await client.responses.create({
-      model: "gpt-5.4-nano",
+      model: "gpt-5.4-mini",
       input: [
         {
           role: "user",
