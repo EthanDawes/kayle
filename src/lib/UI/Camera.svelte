@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte"
+  import { onMount, onDestroy, type Snippet } from "svelte"
   import Spinner from "./components/Spinner.svelte"
   import { resolve } from "$app/paths"
 
@@ -8,9 +8,10 @@
   interface Props {
     onPhotoCaptured: (photo: string, mode: Mode) => void
     mode?: Mode
+    bottomSlot?: Snippet
   }
 
-  let { onPhotoCaptured, mode = $bindable("food") }: Props = $props()
+  let { onPhotoCaptured, mode = $bindable("food"), bottomSlot }: Props = $props()
 
   let videoEl = $state<HTMLVideoElement | null>(null)
   let canvasEl = $state<HTMLCanvasElement | null>(null)
@@ -133,7 +134,7 @@
         <button class="rounded-full bg-amber-50 p-1">+ context</button>
       {/if}
       <div class="flex flex-row items-center gap-4">
-        <a href={resolve("/")} class="size-8 text-2xl">❌</a>
+        <a href={resolve("/")} class="size-8 text-2xl">↩️</a>
         <!-- Shutter button — centered -->
         <button
           onclick={capture}
@@ -158,6 +159,7 @@
         </button>
         <div class="size-8"></div>
       </div>
+      {@render bottomSlot?.()}
     </div>
   {/if}
 </div>

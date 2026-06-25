@@ -77,12 +77,13 @@
 </svelte:head>
 
 <div class="relative h-full">
-  {#if activeMode === "food"}
-    <div class="pointer-events-none absolute inset-x-0 top-0 z-30 p-4">
+  {#snippet mealSelector()}
+    <div class="pointer-events-none inset-x-0 z-30 p-4">
       <MealSelector bind:diningCourt />
     </div>
-  {/if}
-  <Camera onPhotoCaptured={handleCapture} bind:mode={activeMode} />
+  {/snippet}
+
+  <Camera onPhotoCaptured={handleCapture} bind:mode={activeMode} bottomSlot={(activeMode === "food" || undefined) && mealSelector} />
 
   {#if cameraState === "processing"}
     <LoadingOverlay message={statusMessage} />
