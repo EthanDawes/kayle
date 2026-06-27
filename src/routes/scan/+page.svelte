@@ -35,8 +35,11 @@
   let error = $state("")
   let statusMessage = $state("Analyzing...")
 
-  async function handleCapture(photo: string, mode: ScanMode) {
+  let capturedThumbnail = $state<string | null>(null)
+
+  async function handleCapture(photo: string, thumbnail: string, mode: ScanMode) {
     capturedImage = photo
+    capturedThumbnail = thumbnail
     cameraState = "processing"
     statusMessage = mode === "barcode" ? "Detecting barcode..." : "Analyzing food..."
 
@@ -56,7 +59,7 @@
         timestamp: Date.now(),
         name: scaledResult.name,
         nutrients: scaledResult.nutrients,
-        imageDataUrl: scaledResult.imageDataUrl ?? capturedImage ?? undefined,
+        imageDataUrl: capturedThumbnail ?? undefined,
         source: scaledResult.source,
         components: scaledResult.components,
       }),
@@ -67,6 +70,7 @@
   function reset() {
     result = null
     capturedImage = null
+    capturedThumbnail = null
     error = ""
     cameraState = "idle"
   }

@@ -6,7 +6,7 @@
   type Mode = "food" | "barcode"
 
   interface Props {
-    onPhotoCaptured: (photo: string, mode: Mode) => void
+    onPhotoCaptured: (photo: string, thumbnail: string, mode: Mode) => void
     mode?: Mode
     bottomSlot?: Snippet
   }
@@ -55,6 +55,39 @@
     stream = null
   }
 
+  function downloadFullRes(canvas: HTMLCanvasElement): void {
+    const iso = new Date().toISOString().replace(/[:.]/g, "-")
+    const filename = `kayle-meal-${iso}.jpg`
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = filename
+        a.click()
+        URL.revokeObjectURL(url)
+      },
+      "image/jpeg",
+      0.92,
+    )
+  }
+
+  function createThumbnail(canvas: HTMLCanvasElement): string {
+    const size = 56
+    const src = Math.min(canvas.width, canvas.height)
+    const sx = (canvas.width - src) / 2
+    const sy = (canvas.height - src) / 2
+
+    const thumb = document.createElement("canvas")
+    thumb.width = size
+    thumb.height = size
+    const ctx = thumb.getContext("2d")!
+    ctx.drawImage(canvas, sx, sy, src, src, 0, 0, size, size)
+    return thumb.toDataURL("image/jpeg", 0.85)
+  }
+
   async function capture(): Promise<void> {
     if (!cameraReady || capturing) return
     capturing = true
@@ -64,8 +97,14 @@
       canvasEl.height = videoEl.videoHeight
       const ctx = canvasEl.getContext("2d")!
       ctx.drawImage(videoEl, 0, 0)
-      const dataUrl = canvasEl.toDataURL("image/jpeg", 0.92)
-      onPhotoCaptured?.(dataUrl, mode)
+
+      // Download full-resolution image
+      downloadFullRes(canvasEl)
+
+      // Full-res for AI analysis, thumbnail for storage
+      const fullResDataUrl = canvasEl.toDataURL("image/jpeg", 0.92)
+      const thumbnailDataUrl = createThumbnail(canvasEl)
+      onPhotoCaptured?.(fullResDataUrl, thumbnailDataUrl, mode)
     }
 
     await new Promise((r) => setTimeout(r, 300))
