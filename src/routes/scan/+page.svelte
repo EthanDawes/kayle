@@ -78,7 +78,7 @@
 
 <div class="relative h-full">
   {#snippet mealSelector()}
-    <div class="pointer-events-none inset-x-0 z-30 p-4">
+    <div class="pointer-events-none w-full p-4">
       <MealSelector bind:diningCourt />
     </div>
   {/snippet}
