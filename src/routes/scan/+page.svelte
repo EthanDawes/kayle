@@ -83,7 +83,11 @@
     </div>
   {/snippet}
 
-  <Camera onPhotoCaptured={handleCapture} bind:mode={activeMode} bottomSlot={(activeMode === "food" || undefined) && mealSelector} />
+  <Camera
+    onPhotoCaptured={handleCapture}
+    bind:mode={activeMode}
+    bottomSlot={(activeMode === "food" || undefined) && mealSelector}
+  />
 
   {#if cameraState === "processing"}
     <LoadingOverlay message={statusMessage} />

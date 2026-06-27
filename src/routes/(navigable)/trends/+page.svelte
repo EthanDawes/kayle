@@ -1,6 +1,85 @@
 <script lang="ts">
   import NutrientChart from "./NutrientChart.svelte"
   import { NUMERIC_NUTRIENT_KEYS } from "$lib/services/DiningCourtService"
+
+  function getInitialEndDate(): Date {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    return d
+  }
+
+  let mode = $state<"days" | "months">("days")
+  let endDate = $state<Date>(getInitialEndDate())
+
+  function selectMode(newMode: "days" | "months") {
+    mode = newMode
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (newMode === "days") {
+      endDate = today
+    } else {
+      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    }
+  }
+
+  function goBack() {
+    if (mode === "days") {
+      const d = new Date(endDate)
+      d.setDate(d.getDate() - 7)
+      endDate = d
+    } else {
+      const d = new Date(endDate)
+      d.setMonth(d.getMonth() - 1)
+      endDate = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+    }
+  }
+
+  function goForward() {
+    if (!canGoForward) return
+    if (mode === "days") {
+      const d = new Date(endDate)
+      d.setDate(d.getDate() + 7)
+      endDate = d
+    } else {
+      const d = new Date(endDate)
+      d.setMonth(d.getMonth() + 1)
+      endDate = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+    }
+  }
+
+  const canGoForward = $derived.by(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    if (mode === "days") {
+      return endDate.getTime() < today.getTime()
+    } else {
+      return (
+        endDate.getFullYear() < today.getFullYear() ||
+        (endDate.getFullYear() === today.getFullYear() && endDate.getMonth() < today.getMonth())
+      )
+    }
+  })
+
+  const rangeLabel = $derived.by(() => {
+    if (mode === "days") {
+      const start = new Date(endDate)
+      start.setDate(start.getDate() - 6)
+      const startStr = start.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      const endStr = endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      if (start.getFullYear() !== endDate.getFullYear()) {
+        return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })} – ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })}`
+      }
+      return `${startStr} – ${endStr}`
+    } else {
+      const start = new Date(endDate.getFullYear(), endDate.getMonth() - 5, 1)
+      const startStr = start.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+      const endStr = endDate.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+      return `${startStr} – ${endStr}`
+    }
+  })
+
+  const headerSubtitle = $derived(mode === "days" ? "Past 7 Days" : "Monthly Aggregated")
 </script>
 
 <svelte:head>
@@ -8,16 +87,68 @@
 </svelte:head>
 
 <div
-  class="min-h-full bg-linear-to-b from-amber-50 via-orange-50 to-stone-100 px-4 py-5 text-stone-900"
+  class="min-h-full bg-linear-to-b from-amber-50 via-orange-50 to-stone-100 px-4 py-5 pb-28 text-stone-900"
   style="font-family: 'DM Mono', monospace;"
 >
   <header class="mb-4 space-y-2">
-    <p class="text-xs tracking-[0.2em] text-amber-700 uppercase">Past 7 Days</p>
+    <p class="text-xs tracking-[0.2em] text-amber-700 uppercase">{headerSubtitle}</p>
     <h1 class="text-2xl font-bold text-stone-950">Nutrient Trends</h1>
     <p class="text-sm text-stone-600">All nutrients across your logged meals.</p>
   </header>
 
   {#each NUMERIC_NUTRIENT_KEYS as nutrient}
-    <NutrientChart {nutrient} />
+    <NutrientChart {nutrient} {mode} {endDate} />
   {/each}
+
+  <!-- Floating controller -->
+  <div
+    class="fixed bottom-20 left-1/2 z-40 flex w-auto max-w-[calc(100%-2rem)] shrink-0 -translate-x-1/2 items-center justify-between gap-3 rounded-full border border-amber-200/60 bg-white/90 px-3 py-1.5 shadow-lg backdrop-blur-md select-none md:gap-4 md:px-4 md:py-2"
+  >
+    <!-- Navigation section -->
+    <div class="flex items-center gap-2">
+      <button
+        class="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50 disabled:opacity-40 disabled:hover:bg-white"
+        onclick={goBack}
+        aria-label="Previous period"
+      >
+        <span>&larr;</span>
+      </button>
+      <span
+        class="min-w-[100px] text-center text-xs font-semibold whitespace-nowrap text-stone-700"
+      >
+        {rangeLabel}
+      </span>
+      <button
+        class="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50 disabled:opacity-40 disabled:hover:bg-white"
+        onclick={goForward}
+        disabled={!canGoForward}
+        aria-label="Next period"
+      >
+        <span>&rarr;</span>
+      </button>
+    </div>
+
+    <!-- Divider -->
+    <div class="h-6 w-px bg-stone-200"></div>
+
+    <!-- Mode Selector -->
+    <div class="relative flex rounded-full bg-stone-100 p-0.5">
+      <button
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all {mode === 'days'
+          ? 'bg-white text-stone-900 shadow-xs'
+          : 'text-stone-500 hover:text-stone-900'}"
+        onclick={() => selectMode("days")}
+      >
+        Days
+      </button>
+      <button
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all {mode === 'months'
+          ? 'bg-white text-stone-900 shadow-xs'
+          : 'text-stone-500 hover:text-stone-900'}"
+        onclick={() => selectMode("months")}
+      >
+        Months
+      </button>
+    </div>
+  </div>
 </div>

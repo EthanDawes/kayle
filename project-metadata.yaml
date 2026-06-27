@@ -3,9 +3,9 @@ completed: false
 archived: false
 era: purdue
 topic:
-- health
+  - health
 technology:
-- sveltekit
-- ai
+  - sveltekit
+  - ai
 language: typescript
 dependencies: []

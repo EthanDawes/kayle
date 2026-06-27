@@ -13,7 +13,15 @@
   } from "$lib/utils/nutrientUnits"
   import { DayOverviewQuery } from "$lib/queries/DayOverviewQuery"
 
-  let { nutrient }: { nutrient: NumericNutrientKey } = $props()
+  let {
+    nutrient,
+    mode,
+    endDate,
+  }: {
+    nutrient: NumericNutrientKey
+    mode: "days" | "months"
+    endDate: Date
+  } = $props()
 
   let trendPoints = $state<NutrientTrendPoint[]>([])
   let loading = $state(true)
@@ -23,6 +31,7 @@
   let chartInstance: Chart | null = null
   let chartFactory: typeof Chart | null = null
   let mounted = false
+  let currentLoadId = 0
 
   const label = $derived(NutrientTrendsQuery.labelFor(nutrient))
   const unit = $derived(getNutrientUnit(nutrient))
@@ -31,10 +40,16 @@
   const values = $derived(trendPoints.map((p) => p.value))
   const dailyValueLine = $derived(labels.map(() => dailyValue))
   const average = $derived.by(() => {
-    const today = DayOverviewQuery.today()
-    const loggedDays = trendPoints.filter((point) => point.hasMeals && point.date !== today)
-    if (!loggedDays.length) return 0
-    return loggedDays.reduce((sum, point) => sum + point.value, 0) / loggedDays.length
+    if (mode === "days") {
+      const today = DayOverviewQuery.today()
+      const loggedDays = trendPoints.filter((point) => point.hasMeals && point.date !== today)
+      if (!loggedDays.length) return 0
+      return loggedDays.reduce((sum, point) => sum + point.value, 0) / loggedDays.length
+    } else {
+      const loggedMonths = trendPoints.filter((point) => point.hasMeals)
+      if (!loggedMonths.length) return 0
+      return loggedMonths.reduce((sum, point) => sum + point.value, 0) / loggedMonths.length
+    }
   })
   const peak = $derived(Math.max(...values, 0))
 
@@ -49,15 +64,28 @@
     ]
   }
 
-  async function load() {
+  async function load(currentMode: "days" | "months", currentEndDate: Date) {
+    const loadId = ++currentLoadId
     loading = true
     error = ""
     try {
-      trendPoints = await NutrientTrendsQuery.forPastWeek(nutrient)
+      let points: NutrientTrendPoint[]
+      if (currentMode === "days") {
+        points = await NutrientTrendsQuery.forDays(nutrient, currentEndDate)
+      } else {
+        points = await NutrientTrendsQuery.forMonths(nutrient, currentEndDate)
+      }
+      if (loadId === currentLoadId) {
+        trendPoints = points
+      }
     } catch (err) {
-      error = err instanceof Error ? err.message : "Failed to load trends."
+      if (loadId === currentLoadId) {
+        error = err instanceof Error ? err.message : "Failed to load trends."
+      }
     } finally {
-      loading = false
+      if (loadId === currentLoadId) {
+        loading = false
+      }
     }
   }
 
@@ -150,12 +178,15 @@
 
   onMount(() => {
     mounted = true
-    load()
 
     return () => {
       mounted = false
       resetChart()
     }
+  })
+
+  $effect(() => {
+    void load(mode, endDate)
   })
 
   $effect(() => {
@@ -187,7 +218,7 @@
         <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, average)}</p>
       </div>
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
-        <p class="text-stone-500 uppercase">Peak Day</p>
+        <p class="text-stone-500 uppercase">{mode === "days" ? "Peak Day" : "Peak Month"}</p>
         <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, peak)}</p>
       </div>
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
