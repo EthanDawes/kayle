@@ -34,9 +34,10 @@
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
-          width: { ideal: 1080 },
-          height: { ideal: 1920 },
-          //aspectRatio: { ideal: 9 / 16 },
+          //resizeMode: "crop-and-scale"
+          //width: { ideal: 1080 },
+          //height: { ideal: 1920 },
+          aspectRatio: { ideal: 3 / 4 },
         },
         audio: false,
       })
