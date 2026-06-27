@@ -72,7 +72,7 @@
 
 <!-- Root — no rounded edges -->
 <div
-  class="relative h-full min-h-125 w-full overflow-hidden select-none"
+  class="relative h-full min-h-125 w-full overflow-hidden bg-black select-none"
   style="font-family: 'DM Mono', 'Courier New', monospace;"
 >
   <!-- Live video feed -->
@@ -81,7 +81,7 @@
     autoplay
     playsinline
     muted
-    class="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+    class="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
     class:opacity-0={!cameraReady}
   ></video>
 
