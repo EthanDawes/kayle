@@ -161,6 +161,11 @@
       },
     }
 
+    if (chartInstance && chartInstance.canvas !== canvas) {
+      chartInstance.destroy()
+      chartInstance = null
+    }
+
     if (chartInstance) {
       chartInstance.data = config.data
       chartInstance.options = config.options ?? {}
@@ -194,21 +199,25 @@
     values
     dailyValueLine
     canvas
+    loading
     void syncChart()
   })
 </script>
 
 <section class="mt-6 rounded-[28px] border border-amber-200 bg-white/90 p-4 shadow">
-  <h2 class="text-xl font-semibold text-stone-950">{label}</h2>
+  <h2 class="mb-2 text-xl font-semibold text-stone-950">{label}</h2>
 
-  {#if loading}
-    <div class="flex h-48 items-center justify-center">
-      <Spinner />
-    </div>
-  {:else if error}
-    <div class="text-sm text-red-700">{error}</div>
+  {#if error}
+    <div class="py-16 text-center text-sm text-red-700">{error}</div>
   {:else}
-    <div class="h-64">
+    <div class="relative h-64">
+      {#if loading}
+        <div
+          class="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/70 backdrop-blur-[1px]"
+        >
+          <Spinner />
+        </div>
+      {/if}
       <canvas bind:this={canvas}></canvas>
     </div>
 
