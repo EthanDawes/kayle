@@ -87,7 +87,7 @@
 </svelte:head>
 
 <div
-  class="min-h-full bg-linear-to-b from-amber-50 via-orange-50 to-stone-100 px-4 py-5 pb-28 text-stone-900"
+  class="bg-linear-to-b from-amber-50 via-orange-50 to-stone-100 px-4 py-5 pb-21 text-stone-900"
   style="font-family: 'DM Mono', monospace;"
 >
   <header class="mb-4 space-y-2">
