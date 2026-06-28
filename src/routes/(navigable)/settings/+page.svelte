@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DAILY_VALUES } from "$lib"
-  import { settings, type DailyValueKey } from "$lib/stores/settings.svelte"
+  import { settings, MODELS, type DailyValueKey, type Model } from "$lib/stores/settings.svelte"
   import { NUMERIC_NUTRIENT_KEYS, NUMERIC_NUTRIENT_LABELS } from "$lib/services/DiningCourtService"
   import {
     getNutrientUnit,
@@ -8,9 +8,10 @@
     unscaleNutrientValue,
   } from "$lib/utils/nutrientUnits"
 
-  let openaiKey = $state(settings.openaiKey)
+  let openrouterKey = $state(settings.openrouterKey)
   let offKey = $state(settings.openfoodfactsKey)
-  let showOpenai = $state(false)
+  let selectedModel = $state<Model>(settings.model)
+  let showOpenrouter = $state(false)
   let showOff = $state(false)
   let showDailyValues = $state(false)
   let saved = $state(false)
@@ -38,16 +39,17 @@
   }
 
   function save() {
-    settings.setOpenaiKey(openaiKey)
+    settings.setOpenrouterKey(openrouterKey)
     settings.setOpenfoodfactsKey(offKey)
+    settings.setModel(selectedModel)
     saved = true
     setTimeout(() => (saved = false), 2000)
   }
 
   function clear() {
-    openaiKey = ""
+    openrouterKey = ""
     offKey = ""
-    settings.setOpenaiKey("")
+    settings.setOpenrouterKey("")
     settings.setOpenfoodfactsKey("")
   }
 
@@ -67,29 +69,46 @@
   </div>
 
   <div class="flex flex-col gap-5 rounded-2xl border border-zinc-900 p-5">
-    <!-- OpenAI key -->
+    <!-- OpenRouter key -->
     <div class="flex flex-col gap-2">
-      <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="openai-key">
-        OpenAI API Key
+      <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="openrouter-key">
+        OpenRouter API Key
       </label>
-      <p class="text-xs text-zinc-600">Required for food photo analysis (GPT-4o Vision).</p>
+      <p class="text-xs text-zinc-600">Required for food photo analysis.</p>
       <div class="relative">
         <input
-          id="openai-key"
-          type={showOpenai ? "text" : "password"}
-          bind:value={openaiKey}
-          placeholder="sk-..."
+          id="openrouter-key"
+          type={showOpenrouter ? "text" : "password"}
+          bind:value={openrouterKey}
+          placeholder="sk-or-..."
           class="w-full rounded-xl px-4 py-3 pr-12 text-sm placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
         <button
-          onclick={() => (showOpenai = !showOpenai)}
+          onclick={() => (showOpenrouter = !showOpenrouter)}
           class="absolute top-1/2 right-3 -translate-y-1/2 text-lg text-zinc-500 transition-colors hover:text-zinc-300"
-          aria-label="Toggle OpenAI key visibility"
+          aria-label="Toggle OpenRouter key visibility"
           type="button"
         >
-          {showOpenai ? "🙈" : "👁️"}
+          {showOpenrouter ? "🙈" : "👁️"}
         </button>
       </div>
+    </div>
+
+    <!-- Model picker -->
+    <div class="flex flex-col gap-2">
+      <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="model-select">
+        AI Model
+      </label>
+      <p class="text-xs text-zinc-600">Which OpenRouter model analyzes your food.</p>
+      <select
+        id="model-select"
+        bind:value={selectedModel}
+        class="w-full rounded-xl px-4 py-3 text-sm ring-1 ring-zinc-700 outline-none focus:ring-white/30"
+      >
+        {#each MODELS as model (model)}
+          <option value={model}>{model}</option>
+        {/each}
+      </select>
     </div>
 
     <!-- OpenFoodFacts key -->
@@ -123,8 +142,8 @@
   <!-- Info box -->
   <div class="rounded-xl border border-zinc-800 p-4">
     <p class="text-xs leading-relaxed text-zinc-600">
-      Keys are stored only in your browser's localStorage. They are sent directly to OpenAI and Open
-      Food Facts and never routed through any other server.
+      Keys are stored only in your browser's localStorage. They are sent directly to OpenRouter and
+      Open Food Facts and never routed through any other server.
     </p>
   </div>
 
@@ -160,7 +179,7 @@
         </p>
 
         <div class="flex flex-col gap-3">
-          {#each NUMERIC_NUTRIENT_KEYS as key}
+          {#each NUMERIC_NUTRIENT_KEYS as key (key)}
             {@const unit = getNutrientUnit(key)}
             {@const hidden = isHidden(key)}
             <div class="flex items-center gap-3">

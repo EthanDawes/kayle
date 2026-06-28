@@ -1,10 +1,19 @@
 import OpenAI from "openai"
+import { settings } from "$lib/stores/settings.svelte"
 
 function createClient(apiKey: string) {
   return new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
     apiKey,
     dangerouslyAllowBrowser: true,
   })
+}
+
+function apiError(error: unknown): Error {
+  if (error instanceof OpenAI.APIError) {
+    return new Error(error.message || `OpenRouter ${error.status ?? "request failed"}`)
+  }
+  return error instanceof Error ? error : new Error(String(error))
 }
 
 /*
@@ -22,28 +31,19 @@ export async function askAI(apiKey: string, prompt: string): Promise<string> {
   const client = createClient(apiKey)
 
   try {
-    const response = await client.responses.create({
-      model: "gpt-5.4-nano",
-      input: [
-        {
-          role: "user",
-          content: [{ type: "input_text", text: prompt }],
-        },
-      ],
+    const response = await client.chat.completions.create({
+      model: settings.model,
+      messages: [{ role: "user", content: prompt }],
     })
 
     console.log(response)
-    const content = response.output_text
-    if (!content) throw new Error("Empty response from OpenAI")
+    const content = response.choices[0]?.message?.content
+    if (!content) throw new Error("Empty response from OpenRouter")
 
     console.log(content)
     return content
   } catch (error) {
-    if (error instanceof OpenAI.APIError) {
-      throw new Error(error.message || `OpenAI ${error.status ?? "request failed"}`)
-    }
-
-    throw error
+    throw apiError(error)
   }
 }
 
@@ -51,38 +51,21 @@ export async function analyzeText(apiKey: string, prompt: string): Promise<any> 
   const client = createClient(apiKey)
 
   try {
-    const response = await client.responses.create({
-      model: "gpt-5.4-mini",
-      input: [
-        {
-          role: "user",
-          content: [{ type: "input_text", text: prompt }],
-        },
-      ],
-      text: {
-        format: {
-          type: "json_object" as const,
-        },
-      },
-      reasoning: {
-        // All models before gpt-5.1 default to medium reasoning effort, and do not support none.
-        effort: "medium",
-      },
+    const response = await client.chat.completions.create({
+      model: settings.model,
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
     })
 
     console.log(response)
-    const content = response.output_text
-    if (!content) throw new Error("Empty response from OpenAI")
+    const content = response.choices[0]?.message?.content
+    if (!content) throw new Error("Empty response from OpenRouter")
 
     const data = JSON.parse(content)
     console.log(data)
     return data
   } catch (error) {
-    if (error instanceof OpenAI.APIError) {
-      throw new Error(error.message || `OpenAI ${error.status ?? "request failed"}`)
-    }
-
-    throw error
+    throw apiError(error)
   }
 }
 
@@ -94,43 +77,28 @@ export async function analyzeImage(
   const client = createClient(apiKey)
 
   try {
-    const response = await client.responses.create({
-      model: "gpt-5.4-mini",
-      input: [
+    const response = await client.chat.completions.create({
+      model: settings.model,
+      messages: [
         {
           role: "user",
           content: [
-            { type: "input_text", text: prompt },
-            {
-              type: "input_image" as const,
-              image_url: imageDataUrl,
-              detail: "low" as const,
-            },
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: imageDataUrl } },
           ],
         },
       ],
-      text: {
-        format: {
-          type: "json_object" as const,
-        },
-      },
-      reasoning: {
-        effort: "medium",
-      },
+      response_format: { type: "json_object" },
     })
 
     console.log(response)
-    const content = response.output_text
-    if (!content) throw new Error("Empty response from OpenAI")
+    const content = response.choices[0]?.message?.content
+    if (!content) throw new Error("Empty response from OpenRouter")
 
     const data = JSON.parse(content)
     console.log(data)
     return data
   } catch (error) {
-    if (error instanceof OpenAI.APIError) {
-      throw new Error(error.message || `OpenAI ${error.status ?? "request failed"}`)
-    }
-
-    throw error
+    throw apiError(error)
   }
 }

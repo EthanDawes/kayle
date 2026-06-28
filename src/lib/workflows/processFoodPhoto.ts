@@ -8,8 +8,8 @@ export async function processFoodPhoto(
   diningCourt?: MealDescriptor,
   textDescription?: string,
 ): Promise<NutritionInfo> {
-  if (!settings.hasOpenai) {
-    throw new Error("OpenAI API key not set. Go to Settings to add your key.")
+  if (!settings.hasOpenrouter) {
+    throw new Error("OpenRouter API key not set. Go to Settings to add your key.")
   }
 
   let nutrients: Nutrients
@@ -24,7 +24,7 @@ export async function processFoodPhoto(
       .join("\n")
     console.log(servingContext)
     const servingAnalysis = await LLMService.analyzeDiningCourtMeal(
-      settings.openaiKey,
+      settings.openrouterKey,
       imageDataUrl,
       menuContext,
       textDescription,
@@ -59,7 +59,7 @@ export async function processFoodPhoto(
     }, {} as Nutrients)
     console.log(nutrients)
   } else {
-    const res = await LLMService.analyzeFood(settings.openaiKey, imageDataUrl, textDescription)
+    const res = await LLMService.analyzeFood(settings.openrouterKey, imageDataUrl, textDescription)
     nutrients = res.nutrients
     textDescription = res.title
   }

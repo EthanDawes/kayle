@@ -69,7 +69,7 @@
   async function loadSuggestedMeals() {
     loadingSuggestions = true
     try {
-      suggestedMeal = await LLMService.suggestMeals(settings.openaiKey)
+      suggestedMeal = await LLMService.suggestMeals(settings.openrouterKey)
     } catch (err) {
       alert(err)
     }
