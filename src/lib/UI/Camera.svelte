@@ -99,7 +99,8 @@
       ctx.drawImage(videoEl, 0, 0)
 
       // Download full-resolution image
-      downloadFullRes(canvasEl)
+      if (mode === "food")
+        downloadFullRes(canvasEl)
 
       // Full-res for AI analysis, thumbnail for storage
       const fullResDataUrl = canvasEl.toDataURL("image/jpeg", 0.92)
