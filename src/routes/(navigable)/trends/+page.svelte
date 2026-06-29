@@ -5,6 +5,7 @@
   function getInitialEndDate(): Date {
     const d = new Date()
     d.setHours(0, 0, 0, 0)
+    d.setDate(d.getDate() - 1) // Yesterday b/c today is still WIP, will mess up stats
     return d
   }
 
@@ -48,8 +49,7 @@
   }
 
   const canGoForward = $derived.by(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const today = getInitialEndDate()
 
     if (mode === "days") {
       return endDate.getTime() < today.getTime()
