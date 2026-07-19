@@ -103,7 +103,7 @@
   class="relative flex h-full min-h-0 w-full flex-col"
   style="font-family: 'DM Mono', monospace;"
 >
-  <div class="min-h-0 flex-1 overflow-y-auto">
+  <div class="min-h-0 flex-1 overflow-y-auto pb-20">
     <div class="pt-2">
       <div class="flex items-center justify-between gap-3">
         <div>
