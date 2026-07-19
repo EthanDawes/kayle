@@ -26,7 +26,7 @@
   function goBack() {
     if (mode === "days") {
       const d = new Date(endDate)
-      d.setDate(d.getDate() - 7)
+      d.setDate(d.getDate() - 1)
       endDate = d
     } else {
       const d = new Date(endDate)
@@ -39,7 +39,7 @@
     if (!canGoForward) return
     if (mode === "days") {
       const d = new Date(endDate)
-      d.setDate(d.getDate() + 7)
+      d.setDate(d.getDate() + 1)
       endDate = d
     } else {
       const d = new Date(endDate)
@@ -49,7 +49,8 @@
   }
 
   const canGoForward = $derived.by(() => {
-    const today = getInitialEndDate()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
     if (mode === "days") {
       return endDate.getTime() < today.getTime()
@@ -65,16 +66,16 @@
     if (mode === "days") {
       const start = new Date(endDate)
       start.setDate(start.getDate() - 6)
-      const startStr = start.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      const endStr = endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      const startStr = start.toLocaleDateString("en-US", { weekday: "short" })
+      const endStr = endDate.toLocaleDateString("en-US", { weekday: "short" })
       if (start.getFullYear() !== endDate.getFullYear()) {
         return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })} – ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })}`
       }
       return `${startStr} – ${endStr}`
     } else {
       const start = new Date(endDate.getFullYear(), endDate.getMonth() - 5, 1)
-      const startStr = start.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
-      const endStr = endDate.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+      const startStr = start.toLocaleDateString("en-US", { month: "short" })
+      const endStr = endDate.toLocaleDateString("en-US", { month: "short" })
       return `${startStr} – ${endStr}`
     }
   })
@@ -114,7 +115,7 @@
         <span>&larr;</span>
       </button>
       <span
-        class="min-w-[100px] text-center text-xs font-semibold whitespace-nowrap text-stone-700"
+        class="text-center text-xs font-semibold whitespace-nowrap text-stone-700"
       >
         {rangeLabel}
       </span>

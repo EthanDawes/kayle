@@ -223,11 +223,11 @@
 
     <div class="mt-4 grid grid-cols-3 gap-3 text-xs text-stone-600">
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
-        <p class="text-stone-500 uppercase">Average</p>
+        <p class="text-stone-500 uppercase">Day Average</p>
         <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, average)}</p>
       </div>
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
-        <p class="text-stone-500 uppercase">{mode === "days" ? "Peak Day" : "Peak Month"}</p>
+        <p class="text-stone-500 uppercase">Peak Day</p>
         <p class="text-lg text-stone-950">{formatNutrientValue(nutrient, peak)}</p>
       </div>
       <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
