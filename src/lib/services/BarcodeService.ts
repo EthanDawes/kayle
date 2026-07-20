@@ -23,4 +23,10 @@ export const BarcodeService = {
 
     return results[0]?.rawValue ?? null
   },
+
+  async detectElement(image: ImageBitmapSource): Promise<string | null> {
+    const detector = new BarcodeDetector({ formats: FORMATS })
+    const results = await detector.detect(image)
+    return results[0]?.rawValue ?? null
+  },
 }

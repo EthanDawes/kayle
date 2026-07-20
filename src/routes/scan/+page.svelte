@@ -91,6 +91,7 @@
     onPhotoCaptured={handleCapture}
     bind:mode={activeMode}
     bottomSlot={(activeMode === "food" || undefined) && mealSelector}
+    paused={cameraState !== "idle"}
   />
 
   {#if cameraState === "processing"}

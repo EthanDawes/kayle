@@ -2,6 +2,7 @@
   import { onMount, onDestroy, type Snippet } from "svelte"
   import Spinner from "./components/Spinner.svelte"
   import { resolve } from "$app/paths"
+  import { BarcodeService } from "$lib/services/BarcodeService"
 
   type Mode = "food" | "barcode"
 
@@ -9,9 +10,10 @@
     onPhotoCaptured: (photo: string, thumbnail: string, mode: Mode) => void
     mode?: Mode
     bottomSlot?: Snippet
+    paused?: boolean
   }
 
-  let { onPhotoCaptured, mode = $bindable("food"), bottomSlot }: Props = $props()
+  let { onPhotoCaptured, mode = $bindable("food"), bottomSlot, paused = false }: Props = $props()
 
   let videoEl = $state<HTMLVideoElement | null>(null)
   let canvasEl = $state<HTMLCanvasElement | null>(null)
@@ -88,6 +90,34 @@
     return thumb.toDataURL("image/jpeg", 0.85)
   }
 
+  async function checkFrameForBarcode(): Promise<void> {
+    if (!videoEl || !canvasEl || !cameraReady || paused || capturing) return
+    if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) return
+
+    try {
+      canvasEl.width = videoEl.videoWidth
+      canvasEl.height = videoEl.videoHeight
+      const ctx = canvasEl.getContext("2d")!
+      ctx.drawImage(videoEl, 0, 0)
+
+      const barcode = await BarcodeService.detectElement(canvasEl)
+      if (barcode && !paused && !capturing) {
+        const fullResDataUrl = canvasEl.toDataURL("image/jpeg", 0.92)
+        const thumbnailDataUrl = createThumbnail(canvasEl)
+        onPhotoCaptured?.(fullResDataUrl, thumbnailDataUrl, "barcode")
+      }
+    } catch (err) {
+      console.error("Barcode detection error:", err)
+    }
+  }
+
+  $effect(() => {
+    if (cameraReady && !paused && !capturing) {
+      const interval = setInterval(checkFrameForBarcode, 1000)
+      return () => clearInterval(interval)
+    }
+  })
+
   async function capture(): Promise<void> {
     if (!cameraReady || capturing) return
     capturing = true
@@ -98,14 +128,23 @@
       const ctx = canvasEl.getContext("2d")!
       ctx.drawImage(videoEl, 0, 0)
 
-      // Download full-resolution image
-      if (mode === "food")
-        downloadFullRes(canvasEl)
+      let activeMode = mode
+      try {
+        const barcode = await BarcodeService.detectElement(canvasEl)
+        if (barcode) {
+          activeMode = "barcode"
+        }
+      } catch (err) {
+        console.error("Barcode detection during capture error:", err)
+      }
+
+      // Download full-resolution image only if in food mode
+      if (activeMode === "food") downloadFullRes(canvasEl)
 
       // Full-res for AI analysis, thumbnail for storage
       const fullResDataUrl = canvasEl.toDataURL("image/jpeg", 0.92)
       const thumbnailDataUrl = createThumbnail(canvasEl)
-      onPhotoCaptured?.(fullResDataUrl, thumbnailDataUrl, mode)
+      onPhotoCaptured?.(fullResDataUrl, thumbnailDataUrl, activeMode)
     }
 
     await new Promise((r) => setTimeout(r, 300))
