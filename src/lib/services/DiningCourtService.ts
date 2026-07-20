@@ -5,7 +5,7 @@ import type { Coordinates } from "./LocationService"
 
 export type FoodNutrients = Record<string, Nutrients>
 export type NumericNutrientKey = Exclude<keyof Nutrients, "servingSize" | "servingsPerContainer">
-export const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
+export const NUMERIC_NUTRIENT_KEYS = [
   "calories",
   "totalFat",
   "saturatedFat",
@@ -22,7 +22,7 @@ export const NUMERIC_NUTRIENT_KEYS: NumericNutrientKey[] = [
   "calcium",
   "iron",
   "potassium",
-]
+] as const satisfies NumericNutrientKey[]
 
 export interface MealDescriptor {
   // As ISO date yyyy-mm-dd
@@ -33,7 +33,7 @@ export interface MealDescriptor {
   name: string
 }
 
-export const NUMERIC_NUTRIENT_LABELS: Record<NumericNutrientKey, string> = {
+export const NUMERIC_NUTRIENT_LABELS = {
   calories: "Calories",
   totalFat: "Total Fat",
   saturatedFat: "Saturated Fat",
@@ -50,7 +50,7 @@ export const NUMERIC_NUTRIENT_LABELS: Record<NumericNutrientKey, string> = {
   calcium: "Calcium",
   iron: "Iron",
   potassium: "Potassium",
-}
+} as const satisfies Record<NumericNutrientKey, string>
 
 interface DiningLocation {
   latitude: number

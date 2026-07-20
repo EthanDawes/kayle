@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie"
-import type { Meal } from "$lib/models/meal"
+import type { ExportedMeal, Meal } from "$lib/models/meal"
 
 class KayleDB extends Dexie {
   meals!: Table<Meal, number>
@@ -27,5 +27,34 @@ export const MealRepository = {
 
   delete(id: number): Promise<void> {
     return db.meals.delete(id)
+  },
+
+  async getWeek() {
+    const weekAgo = new Date()
+    weekAgo.setHours(0, 0, 0, 0)
+    weekAgo.setDate(weekAgo.getDate() - 8) // 'above' is non-inclusive
+    return (await db.meals.where("date").above(weekAgo.toISOString().split("T")[0]).toArray())
+      .flatMap<{ name: string }>((meal) => meal.components ?? meal)
+      .map((meal) => meal.name)
+  },
+
+  async getExport(): Promise<ExportedMeal[]> {
+    const output: ExportedMeal[] = []
+    for (const meal of await db.meals.toArray()) {
+      if (meal.components) {
+        output.push(
+          ...meal.components.map((component) => ({ ...component, date: new Date(meal.timestamp) })),
+        )
+      } else {
+        output.push({
+          name: meal.name,
+          baseNutrients: meal.nutrients,
+          servingSize: "all",
+          servings: 1,
+          date: new Date(meal.timestamp),
+        })
+      }
+    }
+    return output
   },
 }

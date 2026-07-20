@@ -16,6 +16,11 @@ export interface Meal {
   components?: MealComponent[]
 }
 
+export interface ExportedMeal extends MealComponent {
+  // Id?
+  date: Date
+}
+
 export interface NutritionInfo {
   name: string
   nutrients: Nutrients

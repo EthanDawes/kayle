@@ -1,12 +1,18 @@
 <script lang="ts">
   import { DAILY_VALUES } from "$lib"
-  import { settings, MODELS, type DailyValueKey, type Model } from "$lib/stores/settings.svelte"
-  import { NUMERIC_NUTRIENT_KEYS, NUMERIC_NUTRIENT_LABELS } from "$lib/services/DiningCourtService"
+  import { settings, MODELS, type Model } from "$lib/stores/settings.svelte"
+  import {
+    NUMERIC_NUTRIENT_KEYS,
+    NUMERIC_NUTRIENT_LABELS,
+    type NumericNutrientKey,
+  } from "$lib/services/DiningCourtService"
   import {
     getNutrientUnit,
     scaleNutrientValue,
     unscaleNutrientValue,
   } from "$lib/utils/nutrientUnits"
+  import { MealRepository } from "$lib/repositories/MealRepository"
+  import { dateToExcel } from "$lib"
 
   let openrouterKey = $state(settings.openrouterKey)
   let offKey = $state(settings.openfoodfactsKey)
@@ -16,21 +22,21 @@
   let showDailyValues = $state(false)
   let saved = $state(false)
 
-  function displayValue(key: DailyValueKey): number {
+  function displayValue(key: NumericNutrientKey): number {
     const stored = settings.dailyValues[key]
     if (stored === -1) return scaleNutrientValue(key, DAILY_VALUES[key])
     return scaleNutrientValue(key, stored)
   }
 
-  function isHidden(key: DailyValueKey): boolean {
+  function isHidden(key: NumericNutrientKey): boolean {
     return settings.dailyValues[key] === -1
   }
 
-  function setDisplayValue(key: DailyValueKey, display: number) {
+  function setDisplayValue(key: NumericNutrientKey, display: number) {
     settings.setDailyValue(key, unscaleNutrientValue(key, display))
   }
 
-  function setHidden(key: DailyValueKey, hidden: boolean) {
+  function setHidden(key: NumericNutrientKey, hidden: boolean) {
     if (hidden) {
       settings.setDailyValue(key, -1)
     } else {
@@ -55,6 +61,48 @@
 
   function resetDailyValues() {
     settings.resetDailyValues()
+  }
+
+  async function exportMealLog() {
+    const useExcel = confirm(
+      "Export to Excel format? (Date/durations are in days, otherwise ISO/minutes)",
+    )
+
+    // Get all time entries from the database
+    const allEntries = await MealRepository.getExport()
+
+    // Create CSV header
+    const csvHeader =
+      "Name,Date,Servings,Serving Size," + Object.values(NUMERIC_NUTRIENT_LABELS).join(",") + "\n"
+
+    // Convert entries to CSV rows
+    const csvRows = allEntries
+      .map((entry) => {
+        const startTime = entry.date
+
+        return (
+          `"${entry.name}","${useExcel ? dateToExcel(startTime) : startTime.toISOString()}","${entry.servings}","${entry.servingSize}",` +
+          NUMERIC_NUTRIENT_KEYS.map((key) => entry.baseNutrients[key]).join(",")
+        )
+      })
+      .join("\n")
+
+    // Combine header and rows
+    const csvContent = csvHeader + csvRows
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute("href", url)
+      link.setAttribute("download", `kayle-export-${new Date().toISOString().split("T")[0]}.csv`)
+      link.style.visibility = "hidden"
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
 </script>
 
@@ -216,7 +264,7 @@
         <button
           type="button"
           onclick={resetDailyValues}
-          class="self-start rounded-full border border-zinc-700 px-4 py-2 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+          class="outline-btn self-start px-4 py-2 text-xs"
         >
           Reset to defaults
         </button>
@@ -224,18 +272,28 @@
     {/if}
   </div>
 
-  <!-- Actions -->
   <div class="flex gap-3">
+    <button onclick={exportMealLog} class="outline-btn flex-1 py-3 text-sm" type="button">
+      Export Data
+    </button>
     <button
-      onclick={clear}
-      class="flex-1 rounded-full border border-zinc-700 py-3 text-sm text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+      onclick={async () =>
+        navigator.clipboard.writeText((await MealRepository.getWeek()).join(","))}
+      class="outline-btn flex-1 py-3 text-sm"
       type="button"
     >
+      Copy Week Meals
+    </button>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex gap-3">
+    <button onclick={clear} class="outline-btn flex-1 py-3 text-sm" type="button">
       Clear All
     </button>
     <button
       onclick={save}
-      class="flex-1 rounded-full py-3 text-sm font-semibold transition-all"
+      class="flex-1 rounded-full border border-transparent py-3 text-sm font-semibold transition-all hover:border-zinc-700"
       class:bg-green-500={saved}
       class:text-white={saved}
       class:bg-white={!saved}
@@ -247,3 +305,10 @@
     </button>
   </div>
 </div>
+
+<style lang="postcss">
+  @import "tailwindcss";
+  .outline-btn {
+    @apply rounded-full border border-zinc-700 text-zinc-500 transition-colors hover:border-zinc-600 hover:bg-zinc-700 hover:text-zinc-300;
+  }
+</style>

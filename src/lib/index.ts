@@ -26,3 +26,15 @@ export const DAILY_VALUES = {
   iron: 0.018, // 18mg → grams
   potassium: 4.7, // 4700mg → grams
 } satisfies Required<Nutrients>
+
+export const MINUTE = 1
+export const SECOND = MINUTE / 60
+export const MILLISECOND = SECOND / 1000
+export const HOUR = 60 * MINUTE
+export const DAY = 24 * HOUR
+export const WEEK = 7 * DAY
+
+export const dateToExcel = (date: Date) => {
+  const excelEpoch = new Date(Date.UTC(1899, 11, 30)) // Dec 30, 1899 because of leap year bug
+  return ((date.getTime() - excelEpoch.getTime()) * MILLISECOND) / DAY
+}
