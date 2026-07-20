@@ -3,6 +3,7 @@ import { analyzeImage, analyzeText, askAI } from "$lib/integrations/openai"
 import type { Nutrients } from "$lib/models/meal"
 import type { NumericNutrientKey } from "$lib/services/DiningCourtService"
 import { unscaleNutrientValue } from "$lib/utils/nutrientUnits"
+import { settings, DEFAULT_MEAL_SUGGESTION_PROMPT } from "$lib/stores/settings.svelte"
 
 export interface FoodAnalysis {
   title: string
@@ -82,7 +83,7 @@ export const LLMService = {
     const menuContext = JSON.stringify(await getAllFoods())
 
     const prompt = [
-      "Suggest 3 nutritious, balanced meals following the USDA myplate guidelines. All the items for one meal must come from the same location.",
+      settings.mealSuggestionPrompt || DEFAULT_MEAL_SUGGESTION_PROMPT,
       "",
       menuContext,
       "",

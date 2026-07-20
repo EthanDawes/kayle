@@ -114,9 +114,7 @@
       >
         <span>&larr;</span>
       </button>
-      <span
-        class="text-center text-xs font-semibold whitespace-nowrap text-stone-700"
-      >
+      <span class="text-center text-xs font-semibold whitespace-nowrap text-stone-700">
         {rangeLabel}
       </span>
       <button

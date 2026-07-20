@@ -17,10 +17,10 @@
   let openrouterKey = $state(settings.openrouterKey)
   let offKey = $state(settings.openfoodfactsKey)
   let selectedModel = $state<Model>(settings.model)
+  let mealSuggestionPrompt = $state(settings.mealSuggestionPrompt)
   let showOpenrouter = $state(false)
   let showOff = $state(false)
   let showDailyValues = $state(false)
-  let saved = $state(false)
 
   function displayValue(key: NumericNutrientKey): number {
     const stored = settings.dailyValues[key]
@@ -42,21 +42,6 @@
     } else {
       settings.setDailyValue(key, DAILY_VALUES[key])
     }
-  }
-
-  function save() {
-    settings.setOpenrouterKey(openrouterKey)
-    settings.setOpenfoodfactsKey(offKey)
-    settings.setModel(selectedModel)
-    saved = true
-    setTimeout(() => (saved = false), 2000)
-  }
-
-  function clear() {
-    openrouterKey = ""
-    offKey = ""
-    settings.setOpenrouterKey("")
-    settings.setOpenfoodfactsKey("")
   }
 
   function resetDailyValues() {
@@ -128,6 +113,7 @@
           id="openrouter-key"
           type={showOpenrouter ? "text" : "password"}
           bind:value={openrouterKey}
+          oninput={() => settings.setOpenrouterKey(openrouterKey)}
           placeholder="sk-or-..."
           class="w-full rounded-xl px-4 py-3 pr-12 text-sm placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
@@ -151,6 +137,7 @@
       <select
         id="model-select"
         bind:value={selectedModel}
+        onchange={() => settings.setModel(selectedModel)}
         class="w-full rounded-xl px-4 py-3 text-sm ring-1 ring-zinc-700 outline-none focus:ring-white/30"
       >
         {#each MODELS as model (model)}
@@ -172,6 +159,7 @@
           id="off-key"
           type={showOff ? "text" : "password"}
           bind:value={offKey}
+          oninput={() => settings.setOpenfoodfactsKey(offKey)}
           placeholder="optional"
           class="w-full rounded-xl px-4 py-3 pr-12 text-sm placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
         />
@@ -184,6 +172,22 @@
           {showOff ? "🙈" : "👁️"}
         </button>
       </div>
+    </div>
+
+    <!-- Meal Suggestion Prompt -->
+    <div class="flex flex-col gap-2">
+      <label class="text-xs tracking-[0.2em] text-zinc-400 uppercase" for="meal-prompt">
+        Meal Suggestion Prompt
+      </label>
+      <p class="text-xs text-zinc-600">Customize the prompt used for suggesting meals.</p>
+      <textarea
+        id="meal-prompt"
+        bind:value={mealSuggestionPrompt}
+        oninput={() => settings.setMealSuggestionPrompt(mealSuggestionPrompt)}
+        placeholder="Suggest 3 nutritious, balanced meals..."
+        rows="3"
+        class="w-full resize-y rounded-xl bg-transparent px-4 py-3 text-sm placeholder-zinc-600 ring-1 ring-zinc-700 outline-none focus:ring-white/30"
+      ></textarea>
     </div>
   </div>
 
@@ -283,25 +287,6 @@
       type="button"
     >
       Copy Week Meals
-    </button>
-  </div>
-
-  <!-- Actions -->
-  <div class="flex gap-3">
-    <button onclick={clear} class="outline-btn flex-1 py-3 text-sm" type="button">
-      Clear All
-    </button>
-    <button
-      onclick={save}
-      class="flex-1 rounded-full border border-transparent py-3 text-sm font-semibold transition-all hover:border-zinc-700"
-      class:bg-green-500={saved}
-      class:text-white={saved}
-      class:bg-white={!saved}
-      class:text-zinc-900={!saved}
-      class:hover:opacity-90={!saved}
-      type="button"
-    >
-      {saved ? "✓ Saved" : "Save"}
     </button>
   </div>
 </div>

@@ -15,11 +15,15 @@ export type Model = (typeof MODELS)[number]
 
 const DEFAULT_MODEL: Model = "openai/gpt-5.4-mini"
 
+export const DEFAULT_MEAL_SUGGESTION_PROMPT =
+  "Suggest 3 nutritious, balanced meals following the USDA myplate guidelines. All the items for one meal must come from the same location."
+
 const KEYS = {
   openrouter: "kayle_openrouter_key",
   openfoodfacts: "kayle_off_key",
   dailyValues: "kayle_daily_values",
   model: "kayle_model",
+  mealSuggestionPrompt: "kayle_meal_suggestion_prompt",
 } as const
 
 function load(key: string): string {
@@ -47,11 +51,17 @@ function loadModel(): Model {
   return (MODELS as readonly string[]).includes(raw) ? (raw as Model) : DEFAULT_MODEL
 }
 
+function loadMealSuggestionPrompt(): string {
+  const raw = load(KEYS.mealSuggestionPrompt)
+  return raw !== "" ? raw : DEFAULT_MEAL_SUGGESTION_PROMPT
+}
+
 function createSettings() {
   let openrouterKey = $state(load(KEYS.openrouter))
   let openfoodfactsKey = $state(load(KEYS.openfoodfacts))
   let model = $state(loadModel())
   let dailyValues = $state(loadDailyValues())
+  let mealSuggestionPrompt = $state(loadMealSuggestionPrompt())
 
   return {
     get openrouterKey() {
@@ -74,6 +84,13 @@ function createSettings() {
     setModel(v: Model) {
       model = v
       localStorage.setItem(KEYS.model, v)
+    },
+    get mealSuggestionPrompt() {
+      return mealSuggestionPrompt
+    },
+    setMealSuggestionPrompt(v: string) {
+      mealSuggestionPrompt = v
+      localStorage.setItem(KEYS.mealSuggestionPrompt, v)
     },
     get hasOpenrouter() {
       return openrouterKey.trim().length > 0
