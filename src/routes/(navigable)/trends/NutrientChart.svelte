@@ -2,7 +2,6 @@
   import { onMount } from "svelte"
   import type { Chart, ChartConfiguration, TooltipItem } from "chart.js"
   import { DAILY_VALUES } from "$lib"
-  import { localISODate } from "$lib/integrations/hfsGraphQL"
   import Spinner from "$lib/UI/components/Spinner.svelte"
   import { NutrientTrendsQuery, type NutrientTrendPoint } from "$lib/queries/NutrientTrendsQuery"
   import type { NumericNutrientKey } from "$lib/services/DiningCourtService"

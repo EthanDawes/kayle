@@ -1,6 +1,9 @@
 <script lang="ts">
   import NutrientChart from "./NutrientChart.svelte"
   import { NUMERIC_NUTRIENT_KEYS } from "$lib/services/DiningCourtService"
+  import { MealRepository } from "$lib/repositories/MealRepository"
+  import { dateToExcel } from "$lib"
+  import { NUMERIC_NUTRIENT_LABELS } from "$lib/services/DiningCourtService"
 
   function getInitialEndDate(): Date {
     const d = new Date()
@@ -11,6 +14,15 @@
 
   let mode = $state<"days" | "months">("days")
   let endDate = $state<Date>(getInitialEndDate())
+  const startDate = $derived.by(() => {
+    if (mode === "days") {
+      const start = new Date(endDate)
+      start.setDate(start.getDate() - 6)
+      return start
+    } else {
+      return new Date(endDate.getFullYear(), endDate.getMonth() - 5, 1)
+    }
+  })
 
   function selectMode(newMode: "days" | "months") {
     mode = newMode
@@ -64,23 +76,73 @@
 
   const rangeLabel = $derived.by(() => {
     if (mode === "days") {
-      const start = new Date(endDate)
-      start.setDate(start.getDate() - 6)
-      const startStr = start.toLocaleDateString("en-US", { weekday: "short" })
+      const startStr = startDate.toLocaleDateString("en-US", { weekday: "short" })
       const endStr = endDate.toLocaleDateString("en-US", { weekday: "short" })
-      if (start.getFullYear() !== endDate.getFullYear()) {
-        return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })} – ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })}`
+      if (startDate.getFullYear() !== endDate.getFullYear()) {
+        return `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })} – ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" })}`
       }
       return `${startStr} – ${endStr}`
     } else {
-      const start = new Date(endDate.getFullYear(), endDate.getMonth() - 5, 1)
-      const startStr = start.toLocaleDateString("en-US", { month: "short" })
+      const startStr = startDate.toLocaleDateString("en-US", { month: "short" })
       const endStr = endDate.toLocaleDateString("en-US", { month: "short" })
       return `${startStr} – ${endStr}`
     }
   })
 
   const headerSubtitle = $derived(mode === "days" ? "Past 7 Days" : "Monthly Aggregated")
+
+  async function exportMealLog() {
+    const useExcel = confirm(
+      "Export to Excel format? (Date/durations are in days, otherwise ISO/minutes)",
+    )
+
+    // Get all time entries from the database
+    const allEntries = await MealRepository.getExport()
+
+    // Create CSV header
+    const csvHeader =
+      "Name,Date,Servings,Serving Size," + Object.values(NUMERIC_NUTRIENT_LABELS).join(",") + "\n"
+
+    // Convert entries to CSV rows
+    const csvRows = allEntries
+      .map((entry) => {
+        const startTime = entry.date
+
+        return (
+          `"${entry.name}","${useExcel ? dateToExcel(startTime) : startTime.toISOString()}","${entry.servings}","${entry.servingSize}",` +
+          NUMERIC_NUTRIENT_KEYS.map((key) => entry.baseNutrients[key]).join(",")
+        )
+      })
+      .join("\n")
+
+    // Combine header and rows
+    const csvContent = csvHeader + csvRows
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute("href", url)
+      link.setAttribute("download", `kayle-export-${new Date().toISOString().split("T")[0]}.csv`)
+      link.style.visibility = "hidden"
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+  async function getRangeItems() {
+    return (
+      await MealRepository.getBetweenDates(
+        startDate.toISOString().split("T")[0],
+        endDate.toISOString().split("T")[0],
+      )
+    )
+      .flatMap<{ name: string }>((meal) => meal.components ?? meal)
+      .map((meal) => meal.name)
+  }
 </script>
 
 <svelte:head>
@@ -96,6 +158,19 @@
     <h1 class="text-2xl font-bold text-stone-950">Nutrient Trends</h1>
     <p class="text-sm text-stone-600">All nutrients across your logged meals.</p>
   </header>
+
+  <div class="flex gap-3">
+    <button onclick={exportMealLog} class="outline-btn flex-1 py-3 text-sm" type="button">
+      Export Spreadsheet
+    </button>
+    <button
+      onclick={async () => navigator.clipboard.writeText((await getRangeItems()).join(","))}
+      class="outline-btn flex-1 py-3 text-sm"
+      type="button"
+    >
+      Copy Meals in Range
+    </button>
+  </div>
 
   {#each NUMERIC_NUTRIENT_KEYS as nutrient}
     <NutrientChart {nutrient} {mode} {endDate} />

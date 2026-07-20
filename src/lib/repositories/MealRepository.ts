@@ -29,15 +29,6 @@ export const MealRepository = {
     return db.meals.delete(id)
   },
 
-  async getWeek() {
-    const weekAgo = new Date()
-    weekAgo.setHours(0, 0, 0, 0)
-    weekAgo.setDate(weekAgo.getDate() - 8) // 'above' is non-inclusive
-    return (await db.meals.where("date").above(weekAgo.toISOString().split("T")[0]).toArray())
-      .flatMap<{ name: string }>((meal) => meal.components ?? meal)
-      .map((meal) => meal.name)
-  },
-
   async getExport(): Promise<ExportedMeal[]> {
     const output: ExportedMeal[] = []
     for (const meal of await db.meals.toArray()) {

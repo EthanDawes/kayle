@@ -11,8 +11,6 @@
     scaleNutrientValue,
     unscaleNutrientValue,
   } from "$lib/utils/nutrientUnits"
-  import { MealRepository } from "$lib/repositories/MealRepository"
-  import { dateToExcel } from "$lib"
 
   let openrouterKey = $state(settings.openrouterKey)
   let offKey = $state(settings.openfoodfactsKey)
@@ -46,48 +44,6 @@
 
   function resetDailyValues() {
     settings.resetDailyValues()
-  }
-
-  async function exportMealLog() {
-    const useExcel = confirm(
-      "Export to Excel format? (Date/durations are in days, otherwise ISO/minutes)",
-    )
-
-    // Get all time entries from the database
-    const allEntries = await MealRepository.getExport()
-
-    // Create CSV header
-    const csvHeader =
-      "Name,Date,Servings,Serving Size," + Object.values(NUMERIC_NUTRIENT_LABELS).join(",") + "\n"
-
-    // Convert entries to CSV rows
-    const csvRows = allEntries
-      .map((entry) => {
-        const startTime = entry.date
-
-        return (
-          `"${entry.name}","${useExcel ? dateToExcel(startTime) : startTime.toISOString()}","${entry.servings}","${entry.servingSize}",` +
-          NUMERIC_NUTRIENT_KEYS.map((key) => entry.baseNutrients[key]).join(",")
-        )
-      })
-      .join("\n")
-
-    // Combine header and rows
-    const csvContent = csvHeader + csvRows
-
-    // Create and download the file
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const link = document.createElement("a")
-
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob)
-      link.setAttribute("href", url)
-      link.setAttribute("download", `kayle-export-${new Date().toISOString().split("T")[0]}.csv`)
-      link.style.visibility = "hidden"
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
   }
 </script>
 
@@ -275,25 +231,4 @@
       </div>
     {/if}
   </div>
-
-  <div class="flex gap-3">
-    <button onclick={exportMealLog} class="outline-btn flex-1 py-3 text-sm" type="button">
-      Export Data
-    </button>
-    <button
-      onclick={async () =>
-        navigator.clipboard.writeText((await MealRepository.getWeek()).join(","))}
-      class="outline-btn flex-1 py-3 text-sm"
-      type="button"
-    >
-      Copy Week Meals
-    </button>
-  </div>
 </div>
-
-<style lang="postcss">
-  @import "tailwindcss";
-  .outline-btn {
-    @apply rounded-full border border-zinc-700 text-zinc-500 transition-colors hover:border-zinc-600 hover:bg-zinc-700 hover:text-zinc-300;
-  }
-</style>
