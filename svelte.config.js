@@ -1,4 +1,4 @@
-import adapter from "@sveltejs/adapter-static"
+import adapter from "@sveltejs/adapter-cloudflare"
 import { relative, sep } from "node:path"
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -14,7 +14,7 @@ const config = {
     },
   },
   kit: {
-    adapter: adapter({ fallback: "404.html" }),
+    adapter: adapter(),
     paths: {
       base: process.argv.includes("dev") ? "/BASE_PATH" : process.env.BASE_PATH,
     },

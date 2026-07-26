@@ -2,8 +2,9 @@ import { GraphQLClient } from "graphql-request"
 import { getSdk } from "./generated"
 import type { MealDescriptor } from "$lib/services/DiningCourtService"
 import { DayOverviewQuery } from "$lib/queries/DayOverviewQuery"
+import { resolve } from "$app/paths"
 
-const client = new GraphQLClient("https://kayle.ethand-python.workers.dev")
+const client = new GraphQLClient(resolve("/menu-api"))
 
 export const sdk = getSdk(client)
 
