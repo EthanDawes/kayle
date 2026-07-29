@@ -55,6 +55,11 @@
     await load()
   }
 
+  async function reassignMealDate(id: number, date: string) {
+    await MealRepository.reassignDate(id, date)
+    await load()
+  }
+
   async function goToPreviousDay() {
     selectedDate = addDays(selectedDate, -1)
     await load()
@@ -165,7 +170,7 @@
         </div>
       {/if}
       {#each overview.meals.toReversed() as meal (meal.id)}
-        <MealCard {meal} onDelete={deleteMeal} />
+        <MealCard {meal} onDelete={deleteMeal} onDateChange={reassignMealDate} />
       {/each}
     {/if}
   </div>

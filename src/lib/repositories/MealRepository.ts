@@ -29,6 +29,22 @@ export const MealRepository = {
     return db.meals.delete(id)
   },
 
+  async reassignDate(id: number, date: string): Promise<void> {
+    const meal = await db.meals.get(id)
+    if (!meal) return
+
+    const currentTimestamp = new Date(meal.timestamp)
+    const reassignedTimestamp = new Date(`${date}T00:00:00`)
+    reassignedTimestamp.setHours(
+      currentTimestamp.getHours(),
+      currentTimestamp.getMinutes(),
+      currentTimestamp.getSeconds(),
+      currentTimestamp.getMilliseconds(),
+    )
+
+    await db.meals.update(id, { date, timestamp: reassignedTimestamp.getTime() })
+  },
+
   async getExport(): Promise<ExportedMeal[]> {
     const output: ExportedMeal[] = []
     for (const meal of await db.meals.toArray()) {
