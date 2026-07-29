@@ -1,4 +1,5 @@
 import Dexie, { type Table } from "dexie"
+import "dexie-export-import"
 import type { ExportedMeal, Meal } from "$lib/models/meal"
 
 class KayleDB extends Dexie {
@@ -63,5 +64,13 @@ export const MealRepository = {
       }
     }
     return output
+  },
+
+  exportDump(): Promise<Blob> {
+    return db.export({ prettyJson: true })
+  },
+
+  importDump(file: Blob): Promise<void> {
+    return db.import(file, { clearTablesBeforeImport: true, overwriteValues: true })
   },
 }

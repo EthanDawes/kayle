@@ -11,6 +11,7 @@
     scaleNutrientValue,
     unscaleNutrientValue,
   } from "$lib/utils/nutrientUnits"
+  import { MealRepository } from "$lib/repositories/MealRepository"
 
   let openrouterKey = $state(settings.openrouterKey)
   let offKey = $state(settings.openfoodfactsKey)
@@ -19,6 +20,7 @@
   let showOpenrouter = $state(false)
   let showOff = $state(false)
   let showDailyValues = $state(false)
+  let importFileInput = $state<HTMLInputElement | null>(null)
 
   function displayValue(key: NumericNutrientKey): number {
     const stored = settings.dailyValues[key]
@@ -44,6 +46,36 @@
 
   function resetDailyValues() {
     settings.resetDailyValues()
+  }
+
+  async function exportData() {
+    const blob = await MealRepository.exportDump()
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+
+    link.href = url
+    link.download = `kayle-db-${new Date().toISOString().split("T")[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  function triggerImport() {
+    importFileInput?.click()
+  }
+
+  async function importData(event: Event) {
+    const input = event.currentTarget as HTMLInputElement
+    const file = input.files?.[0]
+    if (!file) return
+
+    try {
+      await MealRepository.importDump(file)
+      window.location.reload()
+    } finally {
+      input.value = ""
+    }
   }
 </script>
 
@@ -230,5 +262,21 @@
         </button>
       </div>
     {/if}
+  </div>
+
+  <div class="flex gap-3">
+    <button type="button" onclick={triggerImport} class="outline-btn flex-1 py-3 text-sm">
+      Import JSON
+    </button>
+    <button type="button" onclick={exportData} class="outline-btn flex-1 py-3 text-sm">
+      Export JSON
+    </button>
+    <input
+      bind:this={importFileInput}
+      type="file"
+      accept="application/json,.json"
+      class="hidden"
+      onchange={importData}
+    />
   </div>
 </div>
