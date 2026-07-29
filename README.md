@@ -1,6 +1,6 @@
 # Kayle
 
-**Wholistic AI meal tracking** — deployed at [ethandawes.github.io/kayle](https://ethandawes.github.io/kayle/)
+**Wholistic AI meal tracking** — deployed at [kaile.pages.dev](https://kaile.pages.dev)
 
 Most nutrition apps only track macros (protein, carbs, calories). Kayle tracks _everything_ and presents it as a familiar nutrition label, so you always know exactly what you're eating without having to learn a new format.
 
